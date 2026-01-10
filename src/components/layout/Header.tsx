@@ -1,5 +1,6 @@
 import { Moon, Sun } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { toggleTheme } from '@/features/theme/themeSlice'
 
@@ -8,8 +9,8 @@ export const Header = () => {
   const theme = useAppSelector((state) => state.theme.mode)
 
   const navLinks = [
-    { name: 'accueil', href: '#' },
-    { name: 'artistes', href: '#projects' },
+    { name: 'accueil', href: '/' },
+    { name: 'artistes', href: '#artists' },
     { name: 'galerie', href: '#gallery' },
   ]
 
@@ -18,11 +19,11 @@ export const Header = () => {
   }
 
   return (
-    <header className="w-full border-b border-neutral-200 bg-background dark:bg-neutral-950 py-6 transition-colors">
+    <header className="w-full border-b-2 border-gray-300 bg-background dark:bg-neutral-950 py-6 transition-colors">
       <nav className="container mx-auto flex items-center justify-between px-8 max-w-7xl">
         {/* Logo */}
-        <div className="text-lg font-medium text-foreground dark:text-white cursor-pointer flex">
-          {"Gallery-La".split("").map((letter, index) => (
+        <Link to="/" className="text-lg font-medium text-foreground dark:text-gray-300 cursor-pointer flex">
+          {"gallery-la".split("").map((letter, index) => (
             <motion.span
               key={index}
               whileHover={{
@@ -38,35 +39,44 @@ export const Header = () => {
               {letter === "-" ? "-" : letter}
             </motion.span>
           ))}
-        </div>
+        </Link>
         
         {/* Navigation and Dark Mode Toggle - Right Side */}
         <div className="flex  items-center gap-8">
           {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="relative text-sm font-medium text-foreground dark:text-white tracking-wide transition-opacity hover:opacity-80 group"
-            >
-              {link.name}
-              {/* Animated underline */}
-              <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-foreground dark:bg-white transition-all duration-300 group-hover:w-full" />
-            </a>
+            link.href.startsWith('#') ? (
+              <a
+                key={link.name}
+                href={link.href}
+                className="text-sm hover:underline text-foreground dark:text-gray-300 tracking-wide transition-opacity hover:opacity-60"
+              >
+                {link.name}
+              </a>
+            ) : (
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-sm hover:underline font- text-foreground dark:text-gray-300 tracking-wide transition-opacity hover:opacity-60"
+              >
+                {link.name}
+              </Link>
+            )
           ))}
           
           {/* Login Button */}
-          <button 
+          <Link 
+            to="/auth"
             className="px-4 py-2 text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-opacity hover:opacity-80"
           >
-            Connexion
-          </button>
+            connexion
+          </Link>
           
           {/* Dark Mode Toggle */}
           <motion.button 
             onClick={handleThemeToggle}
             whileTap={{ scale: 0.9, rotate: 180 }}
             transition={{ duration: 0.3 }}
-            className="text-foreground dark:text-white transition-opacity hover:opacity-60"
+            className="text-foreground dark:text-gray-300 transition-opacity hover:opacity-60"
             aria-label="Basculer le mode sombre"
           >
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}

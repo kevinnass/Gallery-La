@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 export const CTAPopup = () => {
   const [isVisible, setIsVisible] = useState(true)
+  const location = useLocation()
 
-  if (!isVisible) return null
+  // Don't show on auth page
+  if (location.pathname === '/auth' || !isVisible) return null
 
   return (
     <motion.div
@@ -26,14 +29,17 @@ export const CTAPopup = () => {
 
         {/* Content */}
         <div className="pr-6">
-          <h3 className="text-sm font-semibold text-foreground dark:text-white mb-2">
+          <h3 className="text-sm font-semibold text-foreground dark:text-gray-300 mb-2">
             Partagez et présentez vos travaux créatifs
           </h3>
           
           {/* CTA Button */}
-          <button className="w-full px-4 py-2.5 text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-all hover:opacity-90 hover:scale-105">
+          <Link 
+            to="/auth"
+            className="block w-full px-4 py-2.5 text-center text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-all hover:opacity-90 hover:scale-105"
+          >
             S'inscrire
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>
