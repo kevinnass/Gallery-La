@@ -1,4 +1,5 @@
 import { Moon, Sun } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { toggleTheme } from '@/features/theme/themeSlice'
 
@@ -20,19 +21,36 @@ export const Header = () => {
     <header className="w-full border-b border-neutral-200 bg-background dark:bg-neutral-950 py-6 transition-colors">
       <nav className="container mx-auto flex items-center justify-between px-8 max-w-7xl">
         {/* Logo */}
-        <div className="text-lg font-medium text-foreground dark:text-white">
-          Gallery-La
+        <div className="text-lg font-medium text-foreground dark:text-white cursor-pointer flex">
+          {"Gallery-La".split("").map((letter, index) => (
+            <motion.span
+              key={index}
+              whileHover={{
+                y: -5,
+                transition: {
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 10
+                }
+              }}
+              className="inline-block"
+            >
+              {letter === "-" ? "-" : letter}
+            </motion.span>
+          ))}
         </div>
         
         {/* Navigation and Dark Mode Toggle - Right Side */}
-        <div className="flex items-center gap-8">
+        <div className="flex  items-center gap-8">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-foreground dark:text-white tracking-wide transition-opacity hover:opacity-60"
+              className="relative text-sm font-medium text-foreground dark:text-white tracking-wide transition-opacity hover:opacity-80 group"
             >
               {link.name}
+              {/* Animated underline */}
+              <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-foreground dark:bg-white transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
           
@@ -44,13 +62,15 @@ export const Header = () => {
           </button>
           
           {/* Dark Mode Toggle */}
-          <button 
+          <motion.button 
             onClick={handleThemeToggle}
+            whileTap={{ scale: 0.9, rotate: 180 }}
+            transition={{ duration: 0.3 }}
             className="text-foreground dark:text-white transition-opacity hover:opacity-60"
             aria-label="Basculer le mode sombre"
           >
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          </motion.button>
         </div>
       </nav>
     </header>

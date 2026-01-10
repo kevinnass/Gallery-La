@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { Header } from './components/layout/Header'
+import { Footer } from './components/layout/Footer'
+import { CTAPopup } from './components/ui/CTAPopup'
 import { HomePage } from './pages/HomePage'
 import { useAppSelector } from './app/hooks'
 
@@ -19,6 +21,8 @@ function App() {
     <>
       <Header />
       <HomePage />
+      <Footer />
+      <CTAPopup />
     </>
   )
 }
