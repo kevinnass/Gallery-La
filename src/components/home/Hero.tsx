@@ -16,9 +16,24 @@ export const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-4 text-8xl font-display font-bold uppercase tracking-tight text-foreground dark:text-white lg:text-9xl"
+          className="mb-4 text-8xl font-display font-bold uppercase tracking-tight text-foreground dark:text-white lg:text-9xl flex justify-center"
         >
-          GALLERY-La
+          {"GALLERY-La".split("").map((letter, index) => (
+            <motion.span
+              key={index}
+              whileHover={{
+                y: -10,
+                transition: {
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 10
+                }
+              }}
+              className="inline-block"
+            >
+              {letter}
+            </motion.span>
+          ))}
         </motion.h1>
 
       </div>
