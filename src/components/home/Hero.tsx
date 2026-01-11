@@ -10,7 +10,7 @@ export const Hero = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-base text-muted dark:text-neutral-400 lg:text-lg"
         >
-          Une Gallerie pour tout les passionnés de la création
+          une gallerie pour tout les passionnés de la création
         </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}

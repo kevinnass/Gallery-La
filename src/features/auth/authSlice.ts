@@ -17,36 +17,21 @@ const initialState: AuthState = {
 }
 
 // Async thunks
-export const signInWithMagicLink = createAsyncThunk(
-  'auth/signInWithMagicLink',
-  async (email: string, { rejectWithValue }) => {
+export const signInWithOAuth = createAsyncThunk(
+  'auth/signInWithOAuth',
+  async (provider: 'google' | 'github' | 'discord', { rejectWithValue }) => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/dashboard`,
         },
       })
+      
       if (error) throw error
-      return { email }
+      return data
     } catch (error) {
-      return rejectWithValue((error as AuthError).message)
-    }
-  }
-)
-
-export const signInWithGithub = createAsyncThunk(
-  'auth/signInWithGithub',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      })
-      if (error) throw error
-    } catch (error) {
+      console.error('OAuth sign in failed:', error)
       return rejectWithValue((error as AuthError).message)
     }
   }
@@ -80,30 +65,16 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Magic Link
+    // SignIn with OAuth
     builder
-      .addCase(signInWithMagicLink.pending, (state) => {
+      .addCase(signInWithOAuth.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(signInWithMagicLink.fulfilled, (state) => {
+      .addCase(signInWithOAuth.fulfilled, (state) => {
         state.loading = false
       })
-      .addCase(signInWithMagicLink.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload as string
-      })
-
-    // GitHub OAuth
-    builder
-      .addCase(signInWithGithub.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(signInWithGithub.fulfilled, (state) => {
-        state.loading = false
-      })
-      .addCase(signInWithGithub.rejected, (state, action) => {
+      .addCase(signInWithOAuth.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })

@@ -5,6 +5,7 @@ import { Footer } from './components/layout/Footer'
 import { CTAPopup } from './components/ui/CTAPopup'
 import { HomePage } from './pages/HomePage'
 import { AuthPage } from './pages/AuthPage'
+import { DashboardPage } from './pages/DashboardPage'
 import { useAppSelector, useAppDispatch } from './app/hooks'
 import { supabase } from './lib/supabase'
 import { setSession } from './features/auth/authSlice'
@@ -45,6 +46,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
       <Footer />
       <CTAPopup />

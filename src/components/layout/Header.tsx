@@ -3,16 +3,27 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { toggleTheme } from '@/features/theme/themeSlice'
+import { useAuth } from '@/hooks/useAuth'
+import { UserMenu } from './UserMenu'
 
 export const Header = () => {
   const dispatch = useAppDispatch()
   const theme = useAppSelector((state) => state.theme.mode)
+  const { isAuthenticated } = useAuth()
 
   const navLinks = [
     { name: 'accueil', href: '/' },
     { name: 'artistes', href: '#artists' },
     { name: 'galerie', href: '#gallery' },
   ]
+
+  const authenticatedLinks = [
+    { name: 'mes œuvres', href: '/dashboard' },
+  ]
+
+  const links = isAuthenticated 
+    ? [...navLinks, ...authenticatedLinks] 
+    : navLinks
 
   const handleThemeToggle = () => {
     dispatch(toggleTheme())
@@ -43,7 +54,7 @@ export const Header = () => {
         
         {/* Navigation and Dark Mode Toggle - Right Side */}
         <div className="flex  items-center gap-8">
-          {navLinks.map((link) => (
+          {links.map((link) => (
             link.href.startsWith('#') ? (
               <a
                 key={link.name}
@@ -63,13 +74,17 @@ export const Header = () => {
             )
           ))}
           
-          {/* Login Button */}
-          <Link 
-            to="/auth"
-            className="px-4 py-2 text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-opacity hover:opacity-80"
-          >
-            connexion
-          </Link>
+          {/* Auth State */}
+          {isAuthenticated ? (
+            <UserMenu />
+          ) : (
+            <Link 
+              to="/auth"
+              className="px-4 py-2 text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-opacity hover:opacity-80"
+            >
+              connexion
+            </Link>
+          )}
           
           {/* Dark Mode Toggle */}
           <motion.button 

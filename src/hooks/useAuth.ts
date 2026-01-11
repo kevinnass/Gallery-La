@@ -1,24 +1,24 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import {
-  signInWithMagicLink,
-  signInWithGithub,
+  signInWithOAuth,
   signOut as signOutAction,
+  clearError,
 } from '@/features/auth/authSlice'
 
 export const useAuth = () => {
   const dispatch = useAppDispatch()
   const { user, session, loading, error } = useAppSelector((state) => state.auth)
 
-  const sendMagicLink = async (email: string) => {
-    return dispatch(signInWithMagicLink(email))
-  }
-
-  const loginWithGithub = async () => {
-    return dispatch(signInWithGithub())
-  }
+  const loginWithGoogle = () => dispatch(signInWithOAuth('google'))
+  const loginWithGithub = () => dispatch(signInWithOAuth('github'))
+  const loginWithDiscord = () => dispatch(signInWithOAuth('discord'))
 
   const logout = async () => {
     return dispatch(signOutAction())
+  }
+
+  const clearAuthError = () => {
+    dispatch(clearError())
   }
 
   return {
@@ -26,9 +26,11 @@ export const useAuth = () => {
     session,
     loading,
     error,
-    sendMagicLink,
+    loginWithGoogle,
     loginWithGithub,
+    loginWithDiscord,
     logout,
+    clearAuthError,
     isAuthenticated: !!user,
   }
 }

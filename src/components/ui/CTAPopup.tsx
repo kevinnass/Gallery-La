@@ -3,12 +3,15 @@ import { X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import { useAuth } from '@/hooks/useAuth'
+
 export const CTAPopup = () => {
   const [isVisible, setIsVisible] = useState(true)
   const location = useLocation()
+  const { isAuthenticated } = useAuth()
 
-  // Don't show on auth page
-  if (location.pathname === '/auth' || !isVisible) return null
+  // Don't show on auth page or if authenticated
+  if (location.pathname === '/auth' || !isVisible || isAuthenticated) return null
 
   return (
     <motion.div
@@ -30,7 +33,7 @@ export const CTAPopup = () => {
         {/* Content */}
         <div className="pr-6">
           <h3 className="text-sm font-semibold text-foreground dark:text-gray-300 mb-2">
-            Partagez et présentez vos travaux créatifs
+            partagez et présentez vos travaux créatifs
           </h3>
           
           {/* CTA Button */}
