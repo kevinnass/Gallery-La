@@ -11,6 +11,8 @@ interface ArtworkLightboxProps {
   onUpdate: (id: string, data: Partial<Pick<Artwork, 'title' | 'description' | 'is_public'>>) => Promise<Artwork | void>
   onDelete: (id: string) => Promise<void>
   isOwner?: boolean
+  artistName?: string
+  onArtistClick?: (username: string) => void
 }
 
 export const ArtworkLightbox = ({
@@ -20,6 +22,8 @@ export const ArtworkLightbox = ({
   onUpdate,
   onDelete,
   isOwner = true,
+  artistName,
+  onArtistClick
 }: ArtworkLightboxProps) => {
   const [localArtwork, setLocalArtwork] = useState<Artwork | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -120,22 +124,37 @@ export const ArtworkLightbox = ({
               
               {/* Top Bar - Close + Badge */}
               <div className="flex items-center justify-between mb-4">
-                {/* Public/Private Badge */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <span
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-2xl shadow-xl border ${
-                      localArtwork.is_public
-                        ? 'bg-emerald-500/90 text-white border-emerald-400/20'
-                        : 'bg-neutral-800/90 dark:bg-neutral-200/90 text-white dark:text-neutral-900 border-neutral-700/20 dark:border-neutral-300/20'
-                    }`}
+                <div className="flex items-center gap-3">
+                  {/* Public/Private Badge */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
                   >
-                    {localArtwork.is_public ? '🌐 Public' : '🔒 Privé'}
-                  </span>
-                </motion.div>
+                    <span
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-2xl shadow-xl border ${
+                        localArtwork.is_public
+                          ? 'bg-emerald-500/90 text-white border-emerald-400/20'
+                          : 'bg-neutral-800/90 dark:bg-neutral-200/90 text-white dark:text-neutral-900 border-neutral-700/20 dark:border-neutral-300/20'
+                      }`}
+                    >
+                      {localArtwork.is_public ? '🌐 Public' : '🔒 Privé'}
+                    </span>
+                  </motion.div>
+
+                  {/* Artist Name Button */}
+                  {artistName && onArtistClick && (
+                    <motion.button
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.15 }}
+                      onClick={() => onArtistClick(artistName)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-2xl shadow-xl border bg-purple-500/90 hover:bg-purple-600/90 text-white border-purple-400/20 transition-colors"
+                    >
+                      👤 @{artistName}
+                    </motion.button>
+                  )}
+                </div>
 
                 {/* Close Button */}
                 <motion.button

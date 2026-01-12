@@ -13,6 +13,8 @@ interface AudioModalProps {
   onUpdate?: (updates: Partial<Artwork>) => Promise<void>
   onUpdateCover?: (coverFile: File) => Promise<void>
   isOwner?: boolean
+  artistName?: string
+  onArtistClick?: (username: string) => void
 }
 
 export const AudioModal = ({ 
@@ -22,7 +24,9 @@ export const AudioModal = ({
   onDelete, 
   onUpdate,
   onUpdateCover,
-  isOwner = false 
+  isOwner = false,
+  artistName,
+  onArtistClick
 }: AudioModalProps) => {
   const [localArtwork, setLocalArtwork] = useState<Artwork | null>(artwork)
   const [isEditingTitle, setIsEditingTitle] = useState(false)
@@ -270,12 +274,28 @@ export const AudioModal = ({
                       </div>
                     )}
 
-                    <audio 
-                      src={localArtwork.image_url} 
-                      controls 
-                      controlsList="nodownload"
-                      className="w-full max-w-md" 
-                    />
+                    {/* Audio Player */}
+                    <div className="w-full max-w-md">
+                      <audio 
+                        src={localArtwork.image_url} 
+                        controls 
+                        controlsList="nodownload"
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Artist Name Button */}
+                    {artistName && onArtistClick && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        onClick={() => onArtistClick(artistName)}
+                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-purple-500 hover:bg-purple-600 text-white shadow-lg transition-colors"
+                      >
+                        👤 Voir la galerie de @{artistName}
+                      </motion.button>
+                    )}
                   </div>
 
                   {/* Editable Description */}

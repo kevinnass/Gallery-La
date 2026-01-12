@@ -104,6 +104,8 @@ export const PublicGalleryPage = () => {
           isOpen={true}
           onClose={() => setSelectedArtwork(null)}
           isOwner={false}
+          artistName={selectedArtwork.profile?.username}
+          onArtistClick={handleArtistClick}
         />
       ) : (
         /* Lightbox for images and videos */
@@ -114,6 +116,8 @@ export const PublicGalleryPage = () => {
           onUpdate={async () => {}}
           onDelete={async () => {}}
           isOwner={false}
+          artistName={selectedArtwork?.profile?.username}
+          onArtistClick={handleArtistClick}
         />
       )}
     </div>
