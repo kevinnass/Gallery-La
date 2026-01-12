@@ -33,7 +33,8 @@ export const AuthPage = () => {
         </div>
 
         <div className="space-y-4">
-          <SocialAuthButton 
+          <SocialAuthButton
+          className='justify-center' 
             provider="google" 
             onClick={() => {
               clearAuthError()

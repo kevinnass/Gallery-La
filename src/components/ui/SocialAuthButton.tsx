@@ -62,8 +62,8 @@ export const SocialAuthButton = ({
     <Button
       variant="outline"
       className={cn(
-        "w-full h-12 relative flex items-center justify-center gap-3 text-base font-medium",
-        "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800",
+        "w-full h-12  relative rounded-2xl flex items-center justify-center gap-3 text-base font-medium",
+        "bg-gray-50 dark:bg-white border-2 border-black dark:border-white",
         "hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all duration-200",
         className
       )}

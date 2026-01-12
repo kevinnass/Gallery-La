@@ -28,12 +28,12 @@ export const ArtworkCard = ({
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'group relative overflow-hidden rounded-2xl bg-card dark:bg-neutral-900 shadow-sm hover:shadow-md transition-all',
+        'group relative overflow-hidden border-black border rounded-2xl bg-card dark:bg-neutral-900 shadow-sm hover:shadow-md transition-all',
         className
       )}
     >
       {/* Content Container */}
-      <div className="relative aspect-square overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+      <div className="relative aspect-square border-black border overflow-hidden bg-neutral-100 dark:bg-neutral-800">
         {imageUrl && type === 'image' ? (
           <img
             src={imageUrl}

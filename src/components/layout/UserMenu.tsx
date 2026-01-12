@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Settings } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
 export const UserMenu = () => {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
 
   if (!user) return null
@@ -48,11 +50,22 @@ export const UserMenu = () => {
             </div>
             
             <button
+              onClick={() => {
+                navigate('/settings')
+                setIsOpen(false)
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Paramètres
+            </button>
+            
+            <button
               onClick={() => logout()}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
-              Sign out
+              Déconnexion
             </button>
           </motion.div>
         )}

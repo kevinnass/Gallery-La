@@ -18,7 +18,7 @@ export const Header = () => {
   ]
 
   const authenticatedLinks = [
-    { name: 'mes œuvres', href: '/dashboard' },
+    { name: 'mes œuvres', href: '/my-gallery' },
   ]
 
   const links = isAuthenticated 
