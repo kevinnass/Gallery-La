@@ -72,20 +72,20 @@ export const GalleryPage = () => {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-neutral-950">
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-neutral-950">
         <div className="w-12 h-12 border-4 border-neutral-300 dark:border-neutral-700 border-t-neutral-700 dark:border-t-neutral-300 rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-950 pt-32 pb-20">
+    <div className="min-h-screen bg-background dark:bg-neutral-950 pt-32 pb-20">
       <div className="container mx-auto px-6 max-w-7xl">
         {/* Header */}
         <div className="mb-12">
           {!isOwner && (
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors mb-6 text-sm"
             >
               <ArrowLeft className="w-4 h-4" />

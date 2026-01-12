@@ -18,7 +18,7 @@ export const Header = () => {
   ]
 
   const authenticatedLinks = [
-    { name: 'mes œuvres', href: '/my-gallery' },
+    { name: 'ma galerie', href: '/my-gallery' },
   ]
 
   const links = isAuthenticated 
@@ -55,7 +55,17 @@ export const Header = () => {
         {/* Navigation and Dark Mode Toggle - Right Side */}
         <div className="flex  items-center gap-8">
           {links.map((link) => (
-            link.href.startsWith('#') ? (
+            link.href === '/my-gallery' ? (
+              // Special styling for "ma galerie" - purple underline
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-sm relative text-foreground dark:text-gray-300 tracking-wide transition-colors hover:text-neutral-900 dark:hover:text-white group"
+              >
+                {link.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ) : link.href.startsWith('#') ? (
               <a
                 key={link.name}
                 href={link.href}

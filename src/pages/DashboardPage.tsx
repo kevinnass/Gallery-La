@@ -21,7 +21,7 @@ export const DashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen relative pt-32 pb-20 overflow-hidden">
+    <div className="min-h-screen relative bg-background dark:bg-neutral-950 pt-32 pb-20 overflow-hidden">
       {/* Premium Background with Texture */}
       <div className="absolute inset-0 bg-gradient-to-br from-neutral-50 via-amber-50/30 to-neutral-100 dark:from-neutral-950 dark:via-amber-950/10 dark:to-neutral-900" />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9Ii4wMiIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9nPjwvc3ZnPg==')] opacity-40 dark:opacity-20" />
