@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-
+import { Sparkles } from 'lucide-react'
 export const Hero = () => {
   return (
     <section className="bg-background dark:bg-neutral-950 px-4 lg:pt-12 transition-colors">
@@ -25,7 +25,7 @@ export const Hero = () => {
             >
               {letter}
             </motion.span>
-          ))}
+          ))}          
         </motion.h1>
 
       </div>

@@ -11,6 +11,7 @@ import { ArtistsPage } from './pages/ArtistsPage'
 import { GalleryPage } from './pages/GalleryPage'
 import { MyGalleryRedirect } from './pages/MyGalleryRedirect'
 import { SettingsPage } from './pages/SettingsPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 import { useAppSelector, useAppDispatch } from './app/hooks'
 import { useProfile } from './hooks/useProfile'
 import { supabase } from './lib/supabase'
@@ -71,6 +72,7 @@ function App() {
         <Route path="/artists/:username" element={<GalleryPage />} />
         <Route path="/my-gallery" element={<MyGalleryRedirect />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
       <CTAPopup />

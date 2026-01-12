@@ -30,7 +30,7 @@ export const Header = () => {
   }
 
   return (
-    <header className="w-full border-b-2 border-gray-300 bg-background dark:bg-neutral-950 py-6 transition-colors">
+    <header className="w-full bg-background dark:bg-neutral-950 py-6 transition-colors">
       <nav className="container mx-auto flex items-center justify-between px-8 max-w-7xl">
         {/* Logo */}
         <Link to="/" className="text-lg font-medium text-foreground dark:text-gray-300 cursor-pointer flex">
@@ -59,17 +59,19 @@ export const Header = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm hover:underline text-foreground dark:text-gray-300 tracking-wide transition-opacity hover:opacity-60"
+                className="text-sm relative text-foreground dark:text-gray-300 tracking-wide transition-colors hover:text-neutral-900 dark:hover:text-white group"
               >
                 {link.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-neutral-900 dark:bg-white transition-all duration-300 group-hover:w-full" />
               </a>
             ) : (
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-sm hover:underline font- text-foreground dark:text-gray-300 tracking-wide transition-opacity hover:opacity-60"
+                className="text-sm relative text-foreground dark:text-gray-300 tracking-wide transition-colors hover:text-neutral-900 dark:hover:text-white group"
               >
                 {link.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-neutral-900 dark:bg-white transition-all duration-300 group-hover:w-full" />
               </Link>
             )
           ))}
