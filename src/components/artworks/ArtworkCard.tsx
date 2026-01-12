@@ -39,24 +39,46 @@ export const ArtworkCard = ({ artwork, onClick, isOwner = true }: ArtworkCardPro
               </div>
             </div>
           ) : artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i) ? (
-            // Audio Player
-            <div className="relative bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 aspect-square flex flex-col items-center justify-center p-8">
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="relative z-10 text-center mb-6">
-                <div className="text-7xl mb-4 animate-pulse">🎵</div>
-                <h3 className="text-white font-bold text-lg line-clamp-2">
-                  {artwork.title || 'Audio'}
-                </h3>
+            // Audio Player - Modern Design
+            <div className="relative overflow-hidden rounded-lg">
+              {/* Top Section: Cover or Gradient */}
+              <div className="relative aspect-square">
+                {artwork.cover_image_url ? (
+                  // Show cover image if available
+                  <img
+                    src={artwork.cover_image_url}
+                    alt={artwork.title || 'Audio cover'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  // Fallback gradient design with music note
+                  <div className="relative bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 w-full h-full flex flex-col items-center justify-center">
+                    <div className="absolute inset-0 bg-black/10" />
+                    <div className="relative z-10 text-center">
+                      <div className="text-8xl mb-4">🎵</div>
+                      <h3 className="text-white font-bold text-xl line-clamp-2 px-4">
+                        {artwork.title || 'Audio'}
+                      </h3>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Audio Badge */}
+                <div className="absolute top-3 left-3 px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center gap-1.5">
+                  <span className="text-base">🎧</span>
+                  Audio
+                </div>
               </div>
-              <audio
-                src={artwork.image_url}
-                controls
-                className="relative z-10 w-full max-w-sm"
-                preload="metadata"
-              />
-              <div className="absolute top-2 left-2 px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center gap-1.5">
-                <span className="text-lg">🎧</span>
-                Audio
+
+              {/* Bottom Section: Audio Player */}
+              <div className="bg-white dark:bg-neutral-900 p-4">
+                <audio
+                  src={artwork.image_url}
+                  controls
+                  controlsList="nodownload"
+                  className="w-full"
+                  preload="metadata"
+                />
               </div>
             </div>
           ) : (

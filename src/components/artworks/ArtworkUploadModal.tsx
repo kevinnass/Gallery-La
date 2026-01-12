@@ -16,6 +16,8 @@ export const ArtworkUploadModal = ({ isOpen, onClose, onSuccess }: ArtworkUpload
   
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const [coverImage, setCoverImage] = useState<File | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [isPublic, setIsPublic] = useState(false)
@@ -94,6 +96,7 @@ export const ArtworkUploadModal = ({ isOpen, onClose, onSuccess }: ArtworkUpload
       
       await uploadArtwork({
         file,
+        coverImage: coverImage || undefined,
         title: title.trim() || undefined,
         description: description.trim() || undefined,
         is_public: isPublic,
@@ -211,10 +214,65 @@ export const ArtworkUploadModal = ({ isOpen, onClose, onSuccess }: ArtworkUpload
                         className="w-full h-64 rounded-xl bg-black"
                       />
                     ) : file?.type.startsWith('audio/') && preview ? (
-                      <div className="w-full p-8 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl flex flex-col items-center justify-center">
-                        <div className="text-6xl mb-4">🎵</div>
-                        <p className="text-neutral-700 dark:text-neutral-300 font-medium mb-4">{file.name}</p>
-                        <audio src={preview} controls controlsList="nodownload" className="w-full max-w-md" />
+                      <div className="space-y-4">
+                        {/* Cover Image Upload Section */}
+                        <div className="relative">
+                          {coverPreview ? (
+                            <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+                              <img
+                                src={coverPreview}
+                                alt="Cover"
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCoverImage(null)
+                                  setCoverPreview(null)
+                                }}
+                                className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-lg text-white transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="w-full aspect-square bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+                              <div className="text-7xl mb-4">🎵</div>
+                              <p className="text-neutral-700 dark:text-neutral-300 font-medium mb-4 text-center px-4">
+                                {file.name}
+                              </p>
+                              <label className="cursor-pointer">
+                                <span className="px-4 py-2 bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-900 rounded-lg hover:opacity-90 transition-opacity inline-block text-sm">
+                                  Ajouter une cover
+                                </span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const coverFile = e.target.files?.[0]
+                                    if (coverFile && coverFile.type.startsWith('image/')) {
+                                      setCoverImage(coverFile)
+                                      const reader = new FileReader()
+                                      reader.onloadend = () => {
+                                        setCoverPreview(reader.result as string)
+                                      }
+                                      reader.readAsDataURL(coverFile)
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
+                              </label>
+                              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+                                Optionnel - Image pour représenter l'audio
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Audio Player */}
+                        <div className="w-full p-6 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
+                          <audio src={preview} controls controlsList="nodownload" className="w-full" />
+                        </div>
                       </div>
                     ) : null}
                     <button

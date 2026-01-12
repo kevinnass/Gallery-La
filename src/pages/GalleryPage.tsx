@@ -15,7 +15,7 @@ export const GalleryPage = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { getProfileByUsername } = useProfile()
-  const { artworks, loading, fetchPublicArtworks, fetchArtworksByUserId, updateArtwork, deleteArtwork, refetch } = useArtworks()
+  const { artworks, loading, fetchPublicArtworks, fetchArtworksByUserId, updateArtwork, updateCoverImage, deleteArtwork, refetch } = useArtworks()
   
   const [galleryProfile, setGalleryProfile] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(true)
@@ -231,8 +231,11 @@ export const GalleryPage = () => {
           setShowAudioModal(false)
           setSelectedArtwork(null)
         } : undefined}
-        onTogglePublic={isOwner && selectedArtwork ? async () => {
-          await updateArtwork(selectedArtwork.id, { is_public: !selectedArtwork.is_public })
+        onUpdate={isOwner && selectedArtwork ? async (fields: Partial<Artwork>) => {
+          await updateArtwork(selectedArtwork.id, fields)
+        } : undefined}
+        onUpdateCover={isOwner && selectedArtwork ? async (coverFile: File) => {
+          await updateCoverImage(selectedArtwork.id, coverFile)
         } : undefined}
         isOwner={isOwner}
       />

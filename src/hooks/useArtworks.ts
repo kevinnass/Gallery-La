@@ -8,6 +8,7 @@ export interface Artwork {
   title: string
   description: string | null
   image_url: string
+  cover_image_url?: string | null
   is_public: boolean
   created_at: string
   updated_at: string
@@ -18,6 +19,7 @@ export interface ArtworkUploadData {
   description?: string
   is_public?: boolean
   file: File
+  coverImage?: File
 }
 
 export const useArtworks = () => {
@@ -135,6 +137,33 @@ export const useArtworks = () => {
         .from('artworks')
         .getPublicUrl(filePath)
 
+      // Upload cover image if provided (for audio files)
+      let coverImageUrl: string | null = null
+      if (data.coverImage) {
+        const coverExt = data.coverImage.name.split('.').pop()
+        const coverFileName = `${crypto.randomUUID()}_cover.${coverExt}`
+        const coverFilePath = `${user.id}/${coverFileName}`
+
+        const { error: coverUploadError } = await supabase.storage
+          .from('artworks')
+          .upload(coverFilePath, data.coverImage, {
+            cacheControl: '3600',
+            upsert: false,
+          })
+
+        if (coverUploadError) {
+          // If cover upload fails, delete the main file and throw error
+          await supabase.storage.from('artworks').remove([filePath])
+          throw coverUploadError
+        }
+
+        const { data: { publicUrl: coverPublicUrl } } = supabase.storage
+          .from('artworks')
+          .getPublicUrl(coverFilePath)
+        
+        coverImageUrl = coverPublicUrl
+      }
+
       // Create artwork record in database
       const { data: artwork, error: dbError } = await supabase
         .from('artworks')
@@ -143,14 +172,19 @@ export const useArtworks = () => {
           title: data.title || 'Sans titre',
           description: data.description || null,
           image_url: publicUrl,
+          cover_image_url: coverImageUrl,
           is_public: data.is_public || false,
         })
         .select()
         .single()
 
       if (dbError) {
-        // If DB insert fails, delete the uploaded file
+        // If DB insert fails, delete the uploaded files
         await supabase.storage.from('artworks').remove([filePath])
+        if (coverImageUrl) {
+          const coverPath = coverImageUrl.split('/').slice(-2).join('/')
+          await supabase.storage.from('artworks').remove([coverPath])
+        }
         throw dbError
       }
 
@@ -198,6 +232,71 @@ export const useArtworks = () => {
     if (!artwork) throw new Error('Artwork not found')
 
     return updateArtwork(id, { is_public: !artwork.is_public })
+  }
+
+  const updateCoverImage = async (id: string, coverImageFile: File): Promise<Artwork> => {
+    if (!user) throw new Error('No user logged in')
+
+    try {
+      setError(null)
+
+      // Upload new cover image
+      const coverExt = coverImageFile.name.split('.').pop()
+      const coverFileName = `${crypto.randomUUID()}_cover.${coverExt}`
+      const coverFilePath = `${user.id}/${coverFileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('artworks')
+        .upload(coverFilePath, coverImageFile, {
+          cacheControl: '3600',
+          upsert: false,
+        })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('artworks')
+        .getPublicUrl(coverFilePath)
+
+      // Get current artwork to find old cover
+      const { data: currentArtwork } = await supabase
+        .from('artworks')
+        .select('cover_image_url')
+        .eq('id', id)
+        .single()
+
+      // Update artwork with new cover URL
+      const { data, error: updateError } = await supabase
+        .from('artworks')
+        .update({ cover_image_url: publicUrl })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (updateError) {
+        // If update fails, delete the uploaded cover
+        await supabase.storage.from('artworks').remove([coverFilePath])
+        throw updateError
+      }
+
+      // Delete old cover image if it exists
+      if (currentArtwork?.cover_image_url) {
+        const oldCoverPath = currentArtwork.cover_image_url.split('/').slice(-2).join('/')
+        await supabase.storage.from('artworks').remove([oldCoverPath])
+      }
+
+      // Update local state
+      setArtworks((prev) =>
+        prev.map((artwork) => (artwork.id === id ? data : artwork))
+      )
+
+      return data
+    } catch (err) {
+      console.error('Error updating cover image:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update cover image'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    }
   }
 
   const deleteArtwork = async (id: string): Promise<void> => {
@@ -250,6 +349,7 @@ export const useArtworks = () => {
     fetchArtworksByUserId,
     uploadArtwork,
     updateArtwork,
+    updateCoverImage,
     togglePublic,
     deleteArtwork,
     refetch: fetchUserArtworks,

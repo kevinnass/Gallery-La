@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   confirmText?: string
   cancelText?: string
   variant?: 'danger' | 'warning' | 'info'
+  isLoading?: boolean
 }
 
 export const ConfirmDialog = ({
@@ -22,6 +23,7 @@ export const ConfirmDialog = ({
   confirmText = 'Confirmer',
   cancelText = 'Annuler',
   variant = 'danger',
+  isLoading = false,
 }: ConfirmDialogProps) => {
   const handleConfirm = () => {
     onConfirm()
@@ -57,12 +59,12 @@ export const ConfirmDialog = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
             onClick={onClose}
           />
 
           {/* Dialog */}
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 flex items-center justify-center z-[100] p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -100,13 +102,16 @@ export const ConfirmDialog = ({
                   variant="outline"
                   onClick={onClose}
                   className="flex-1"
+                  disabled={isLoading}
                 >
                   {cancelText}
                 </Button>
                 <button
                   onClick={handleConfirm}
-                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${styles.button}`}
+                  disabled={isLoading}
+                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${styles.button} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''} flex items-center justify-center gap-2`}
                 >
+                  {isLoading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                   {confirmText}
                 </button>
               </div>
