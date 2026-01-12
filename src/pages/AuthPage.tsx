@@ -11,7 +11,7 @@ export const AuthPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard')
+      navigate('/')
     }
   }, [isAuthenticated, navigate])
 
@@ -24,11 +24,11 @@ export const AuthPage = () => {
         className="w-full max-w-md space-y-8"
       >
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-light tracking-tight text-neutral-900 dark:text-neutral-50">
+          <h1 className="text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
             Bienvenue
           </h1>
-          <p className="text-neutral-500 dark:text-neutral-400">
-            Connectez-vous pour accéder à votre galerie
+          <p className="text-neutral-500 text- w-full dark:text-neutral-400">
+            Connectez-vous pour accéder à votre galerie personnelle
           </p>
         </div>
 

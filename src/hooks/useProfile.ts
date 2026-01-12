@@ -13,6 +13,11 @@ export interface Profile {
   updated_at?: string
 }
 
+export interface ProfileWithStats extends Profile {
+  artwork_count: number
+  recent_artworks?: Array<{ id: string; image_url: string; cover_image_url?: string | null }>
+}
+
 export const useProfile = () => {
   const { user } = useAuth()
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -153,6 +158,74 @@ export const useProfile = () => {
     }
   }
 
+  const fetchAllArtists = async (): Promise<ProfileWithStats[]> => {
+    try {
+      // Fetch all public artworks with user_id
+      const { data: artworks, error: artworksError } = await supabase
+        .from('artworks')
+        .select('id, user_id, image_url, cover_image_url, created_at')
+        .eq('is_public', true)
+        .order('created_at', { ascending: false })
+
+      if (artworksError) throw artworksError
+
+      if (!artworks || artworks.length === 0) {
+        return []
+      }
+
+      // Group artworks by user_id and count
+      const userStats = new Map<string, { count: number; recentArtworks: typeof artworks }>()
+      
+      artworks.forEach(artwork => {
+        const existing = userStats.get(artwork.user_id)
+        if (existing) {
+          existing.count++
+          if (existing.recentArtworks.length < 3) {
+            existing.recentArtworks.push(artwork)
+          }
+        } else {
+          userStats.set(artwork.user_id, {
+            count: 1,
+            recentArtworks: [artwork]
+          })
+        }
+      })
+
+      // Get unique user IDs
+      const userIds = Array.from(userStats.keys())
+
+      // Fetch profiles for these users
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', userIds)
+
+      if (profilesError) throw profilesError
+
+      // Merge profiles with stats
+      const artistsWithStats: ProfileWithStats[] = (profiles || []).map(profile => {
+        const stats = userStats.get(profile.id)!
+        return {
+          ...profile,
+          artwork_count: stats.count,
+          recent_artworks: stats.recentArtworks.map(a => ({
+            id: a.id,
+            image_url: a.image_url,
+            cover_image_url: a.cover_image_url
+          }))
+        }
+      })
+
+      // Sort by artwork count
+      artistsWithStats.sort((a, b) => b.artwork_count - a.artwork_count)
+
+      return artistsWithStats
+    } catch (err) {
+      console.error('Error fetching all artists:', err)
+      return []
+    }
+  }
+
   return {
     profile,
     loading,
@@ -161,6 +234,7 @@ export const useProfile = () => {
     checkUsernameAvailable,
     getProfileByUsername,
     createOrUpdateProfile,
+    fetchAllArtists,
     refetch: fetchProfile,
   }
 }

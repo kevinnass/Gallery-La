@@ -6,6 +6,8 @@ import { CTAPopup } from './components/ui/CTAPopup'
 import { ProfileCompletionModal } from './components/profile/ProfileCompletionModal'
 import { HomePage } from './pages/HomePage'
 import { AuthPage } from './pages/AuthPage'
+import { PublicGalleryPage } from './pages/PublicGalleryPage'
+import { ArtistsPage } from './pages/ArtistsPage'
 import { GalleryPage } from './pages/GalleryPage'
 import { MyGalleryRedirect } from './pages/MyGalleryRedirect'
 import { SettingsPage } from './pages/SettingsPage'
@@ -64,8 +66,10 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/my-gallery" element={<MyGalleryRedirect />} />
+        <Route path="/gallery" element={<PublicGalleryPage />} />
+        <Route path="/artists" element={<ArtistsPage />} />
         <Route path="/artists/:username" element={<GalleryPage />} />
+        <Route path="/my-gallery" element={<MyGalleryRedirect />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
       <Footer />

@@ -13,8 +13,8 @@ export const Header = () => {
 
   const navLinks = [
     { name: 'accueil', href: '/' },
-    { name: 'artistes', href: '#artists' },
-    { name: 'galerie', href: '#gallery' },
+    { name: 'galerie', href: '/gallery' },
+    { name: 'artistes', href: '/artists' },
   ]
 
   const authenticatedLinks = [

@@ -22,6 +22,13 @@ export interface ArtworkUploadData {
   coverImage?: File
 }
 
+export interface ArtworkWithProfile extends Artwork {
+  profile?: {
+    username: string
+    avatar_url?: string | null
+  }
+}
+
 export const useArtworks = () => {
   const { user } = useAuth()
   const [artworks, setArtworks] = useState<Artwork[]>([])
@@ -101,6 +108,58 @@ export const useArtworks = () => {
     } catch (err) {
       console.error('Error fetching artworks by user ID:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch artworks')
+      return []
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Fetch all public artworks from all users (for homepage feed)
+  const fetchAllPublicArtworks = useCallback(async (limit: number = 50): Promise<ArtworkWithProfile[]> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Fetch public artworks
+      const { data: artworksData, error: artworksError } = await supabase
+        .from('artworks')
+        .select('*')
+        .eq('is_public', true)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+
+      if (artworksError) throw artworksError
+
+      if (!artworksData || artworksData.length === 0) {
+        return []
+      }
+
+      // Get unique user IDs
+      const userIds = [...new Set(artworksData.map(a => a.user_id))]
+
+      // Fetch profiles for these users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', userIds)
+
+      if (profilesError) throw profilesError
+
+      // Create a map of profiles by user_id
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.id, { username: p.username, avatar_url: p.avatar_url }])
+      )
+
+      // Merge artworks with profiles
+      const artworksWithProfiles: ArtworkWithProfile[] = artworksData.map(artwork => ({
+        ...artwork,
+        profile: profilesMap.get(artwork.user_id)
+      }))
+
+      return artworksWithProfiles
+    } catch (err) {
+      console.error('Error fetching all public artworks:', err)
+      setError(err instanceof Error ? err.message : 'Failed to fetch public artworks')
       return []
     } finally {
       setLoading(false)
@@ -346,6 +405,7 @@ export const useArtworks = () => {
     error,
     fetchUserArtworks,
     fetchPublicArtworks,
+    fetchAllPublicArtworks,
     fetchArtworksByUserId,
     uploadArtwork,
     updateArtwork,

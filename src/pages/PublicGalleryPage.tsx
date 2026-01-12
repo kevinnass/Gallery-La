@@ -21,7 +21,7 @@ const item = {
   show: { opacity: 1, y: 0 },
 }
 
-export const ArtworkGrid = () => {
+export const PublicGalleryPage = () => {
   const navigate = useNavigate()
   const { fetchAllPublicArtworks, loading } = useArtworks()
   const [publicArtworks, setPublicArtworks] = useState<ArtworkWithProfile[]>([])
@@ -40,8 +40,18 @@ export const ArtworkGrid = () => {
   }
 
   return (
-    <section className="bg-background dark:bg-neutral-950 px-4 py-12 lg:py-16 transition-colors">
-      <div className="container mx-auto max-w-7xl">
+    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors pt-20">
+      <div className="container mx-auto max-w-7xl px-4 py-12">
+        {/* Page Header */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            Galerie Publique
+          </h1>
+          <p className="text-lg text-neutral-600 dark:text-neutral-400">
+            Découvrez les créations de notre communauté d'artistes
+          </p>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center py-32">
             <div className="w-12 h-12 border-4 border-neutral-300 dark:border-neutral-700 border-t-neutral-700 dark:border-t-neutral-300 rounded-full animate-spin" />
@@ -106,6 +116,6 @@ export const ArtworkGrid = () => {
           isOwner={false}
         />
       )}
-    </section>
+    </div>
   )
 }

@@ -5,9 +5,11 @@ interface ArtworkCardProps {
   artwork: Artwork
   onClick: () => void
   isOwner?: boolean
+  artistName?: string
+  onArtistClick?: (username: string) => void
 }
 
-export const ArtworkCard = ({ artwork, onClick, isOwner = true }: ArtworkCardProps) => {
+export const ArtworkCard = ({ artwork, onClick, isOwner = true, artistName, onArtistClick }: ArtworkCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -100,7 +102,7 @@ export const ArtworkCard = ({ artwork, onClick, isOwner = true }: ArtworkCardPro
       </div>
 
       {/* Info Label */}
-      {(artwork.title || artwork.description) && (
+      {(artwork.title || artwork.description || artistName) && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -121,6 +123,18 @@ export const ArtworkCard = ({ artwork, onClick, isOwner = true }: ArtworkCardPro
             <p className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-1 mt-1">
               {artwork.description}
             </p>
+          )}
+          {artistName && onArtistClick && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onArtistClick(artistName)
+              }}
+              className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors mt-1 flex items-center gap-1"
+            >
+              <span>by</span>
+              <span className="font-medium">@{artistName}</span>
+            </button>
           )}
         </motion.div>
       )}
