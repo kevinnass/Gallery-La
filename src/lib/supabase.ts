@@ -11,6 +11,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    // Use current origin for redirects (localhost in dev, Vercel in prod)
+    flowType: 'pkce'
   }
 })
+
+// Helper function to get the correct redirect URL
+export const getRedirectUrl = () => {
+  return window.location.origin
+}
