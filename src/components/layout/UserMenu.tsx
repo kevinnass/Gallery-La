@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LogOut, User, Settings } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -8,27 +8,47 @@ export const UserMenu = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   if (!user) return null
 
   const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
   const avatarUrl = user.user_metadata?.avatar_url
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
   return (
     <div 
+      ref={menuRef}
       className="relative flex z-50"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
     >
-      <button className="flex items-center gap-2 py-2 px-3 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-        <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center border border-neutral-200 dark:border-neutral-700">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 py-2 px-2 sm:px-3 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      >
+        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center border border-neutral-200 dark:border-neutral-700">
           {avatarUrl ? (
             <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
           ) : (
-            <User className="w-4 h-4 text-neutral-500" />
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-500" />
           )}
         </div>
-        <span className="text-xs font-medium text-neutral-700 dark:text-neutral-200 hidden md:block">
+        <span className="text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200 hidden md:block">
           {displayName}
         </span>
       </button>
@@ -40,9 +60,10 @@ export const UserMenu = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden p-1"
+            className="absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden p-1"
           >
-            <div className="px-3 py-2 border-b border-neutral-100 dark:border-neutral-800 mb-1 md:hidden">
+            {/* User info - always visible on mobile */}
+            <div className="px-3 py-3 border-b border-neutral-100 dark:border-neutral-800 mb-1">
               <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
                 {displayName}
               </p>
@@ -54,15 +75,18 @@ export const UserMenu = () => {
                 navigate('/settings')
                 setIsOpen(false)
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
             >
               <Settings className="w-4 h-4" />
               Paramètres
             </button>
             
             <button
-              onClick={() => logout()}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
+              onClick={() => {
+                logout()
+                setIsOpen(false)
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Déconnexion
