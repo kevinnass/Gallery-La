@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
+import { MobileBottomNav } from './components/layout/MobileBottomNav'
 import { CTAPopup } from './components/ui/CTAPopup'
 import { ProfileCompletionModal } from './components/profile/ProfileCompletionModal'
 import { HomePage } from './pages/HomePage'
@@ -75,6 +76,7 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
+      <MobileBottomNav />
       <CTAPopup />
       
       {/* Profile Completion Modal */}

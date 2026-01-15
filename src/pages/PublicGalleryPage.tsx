@@ -40,7 +40,7 @@ export const PublicGalleryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors pt-20">
+    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors pt-20 pb-20 md:pb-0">
       <div className="container mx-auto max-w-7xl px-4 py-12">
         {/* Page Header */}
         <div className="mb-12 text-center">

@@ -7,7 +7,7 @@ export const HomePage = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors overflow-hidden">
+    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors overflow-hidden pb-20 md:pb-0">
       <Hero /> 
       
       {/* Decorative Background Elements */}
