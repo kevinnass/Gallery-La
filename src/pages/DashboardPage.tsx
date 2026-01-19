@@ -51,7 +51,7 @@ export const DashboardPage = () => {
           >
             <Button
               onClick={() => setShowUploadModal(true)}
-              className="flex items-center gap-2 px-6 py-3 text-base shadow-lg hover:shadow-xl transition-shadow"
+              className="flex border border-black dark:border-white items-center gap-2 px-6 py-3 text-base shadow-lg hover:shadow-xl transition-shadow"
             >
               <Plus className="w-5 h-5" />
               Nouvelle œuvre

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { Search } from 'lucide-react'
 import { useProfile, type ProfileWithStats } from '@/hooks/useProfile'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
 
@@ -24,6 +25,7 @@ export const ArtistsPage = () => {
   const { fetchAllArtists } = useProfile()
   const [artists, setArtists] = useState<ProfileWithStats[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const loadArtists = async () => {
@@ -34,6 +36,15 @@ export const ArtistsPage = () => {
     }
     loadArtists()
   }, [])
+
+  const filteredArtists = artists.filter(artist => {
+    const query = searchQuery.toLowerCase()
+    return (
+      (artist.username?.toLowerCase().includes(query)) ||
+      (artist.specialty?.toLowerCase().includes(query)) ||
+      (artist.bio?.toLowerCase().includes(query))
+    )
+  })
 
   return (
     <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors pt-32 pb-20 selection:bg-purple-500/30">
@@ -58,6 +69,23 @@ export const ArtistsPage = () => {
           </motion.div>
         </div>
 
+        {/* Search Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-12 relative max-w-md"
+        >
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+          <input
+            type="text"
+            placeholder="Rechercher un artiste, une spécialité..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white/50 dark:bg-neutral-900/50 border-[0.5px] border-neutral-200 dark:border-neutral-800 rounded-sm py-3 pl-12 pr-4 text-sm font-light focus:outline-none focus:border-purple-600/30 transition-colors placeholder:text-neutral-400"
+          />
+        </motion.div>
+
         {loading ? (
           <div className="flex items-center justify-center py-48">
             <motion.div 
@@ -66,37 +94,33 @@ export const ArtistsPage = () => {
               className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full" 
             />
           </div>
-        ) : artists.length === 0 ? (
+        ) : filteredArtists.length === 0 ? (
           <div className="text-center py-48">
             <p className="text-neutral-400 dark:text-neutral-500 text-xs font-light uppercase tracking-[0.5em]">
-              Aucun artiste répertorié
+              Aucun artiste correspondant
             </p>
           </div>
         ) : (
           <motion.div
             variants={container}
+            key={`artists-grid-${searchQuery}`} // Trigger animation on search
             initial="hidden"
             animate="show"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
           >
-            {artists.map((artist) => (
+            {filteredArtists.map((artist) => (
               <motion.div
                 key={artist.id}
                 variants={item}
                 onClick={() => navigate(`/artists/${artist.username}`)}
-                className="group cursor-crosshair border-[0.5px] border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-950/50 backdrop-blur-sm p-8 transition-all duration-700 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 relative overflow-hidden"
+                className="group cursor-pointer border-[0.5px] border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-950/50 backdrop-blur-sm p-8 transition-all duration-700 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 relative overflow-hidden"
               >
                 {/* Internal "Canvas" Border */}
                 <div className="absolute inset-2 border-[0.5px] border-neutral-100 dark:border-neutral-900 group-hover:border-purple-500/10 transition-colors duration-700 pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="flex-1 mb-12">
-                     <div className="flex items-center justify-between mb-6">
-                      <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400 dark:text-neutral-500 font-medium">
-                        Profil_Artiste
-                      </span>
-                      <div className="w-8 h-px bg-neutral-100 dark:bg-neutral-900" />
-                    </div>
+                    <div className="w-8 h-px bg-neutral-100 dark:bg-neutral-900" />
 
                     <h3 className="text-3xl font-display font-medium text-neutral-900 dark:text-neutral-100 tracking-tight mb-4 group-hover:text-purple-600 transition-colors duration-500">
                       {artist.username || 'Anonyme'}
@@ -144,13 +168,12 @@ export const ArtistsPage = () => {
                   {/* Museum Stats Label */}
                   <div className="flex items-center justify-between border-t border-neutral-100 dark:border-neutral-900 pt-6">
                     <div className="space-y-1">
-                      <p className="text-[7px] uppercase tracking-[0.3em] text-neutral-400">Statut_Inventaire</p>
                       <p className="text-[10px] uppercase tracking-[0.1em] font-medium text-neutral-600 dark:text-neutral-400">
                         Taille de la collection: {artist.artwork_count.toString().padStart(2, '0')}
                       </p>
                     </div>
                     <div className="opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-4 group-hover:translate-x-0">
-                      <span className="text-[9px] uppercase tracking-[0.3em] text-purple-600 font-medium">Entrer →</span>
+                      <span className="text-[9px] uppercase tracking-[0.3em] text-purple-600 font-medium">Voir →</span>
                     </div>
                   </div>
                 </div>

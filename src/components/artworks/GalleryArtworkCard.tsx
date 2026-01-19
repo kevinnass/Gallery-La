@@ -25,7 +25,7 @@ export const GalleryArtworkCard = ({
     return (
       <motion.div
         onClick={onClick}
-        className="group relative w-full space-y-8 cursor-crosshair pb-12 border-b border-neutral-100 dark:border-neutral-900"
+        className="group relative w-full space-y-8 cursor-pointer pb-12 border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="relative overflow-hidden bg-neutral-50 dark:bg-neutral-900/30">
           {isVideo ? (
@@ -89,7 +89,7 @@ export const GalleryArtworkCard = ({
       whileHover={{ y: -5 }}
       transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       onClick={onClick}
-      className={`group relative bg-white/50 dark:bg-neutral-950/50 border-[0.5px] border-neutral-200 dark:border-neutral-800 flex flex-col items-center overflow-hidden cursor-crosshair transition-all duration-700 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 backdrop-blur-sm ${
+      className={`group relative bg-white/50 dark:bg-neutral-950/50 border-[0.5px] border-neutral-200 dark:border-neutral-800 flex flex-col items-center overflow-hidden cursor-pointer transition-all duration-700 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 backdrop-blur-sm ${
         isFluid ? 'p-2 pt-4 pb-16' : 'p-6 md:p-8 aspect-[4/5]'
       }`}
     >

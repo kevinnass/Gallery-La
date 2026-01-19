@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ArrowLeft, Grid, Layout, Maximize2, Loader2 } from 'lucide-react'
+import { Plus, ArrowLeft, Grid, Layout, Maximize2, Loader2, Camera, Music, Play, LayoutGrid, SlidersHorizontal, Search } from 'lucide-react'
 import { useArtworks, type Artwork } from '@/hooks/useArtworks'
 import { useProfile } from '@/hooks/useProfile'
 import { useAuth } from '@/hooks/useAuth'
@@ -30,7 +30,7 @@ const item = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: [0.23, 1, 0.32, 1]
+      ease: [0.23, 1, 0.32, 1] as any
     }
   },
 }
@@ -42,14 +42,16 @@ export const GalleryPage = () => {
   const { getProfileByUsername } = useProfile()
   const { artworks, loading, fetchPublicArtworks, fetchArtworksByUserId, updateArtwork, updateCoverImage, deleteArtwork, refetch } = useArtworks()
   const { createOrUpdateProfile } = useProfile()
-  
+
   const [galleryProfile, setGalleryProfile] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(true)
   const [isUpdatingLayout, setIsUpdatingLayout] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
-  const [showAudioModal, setShowAudioModal] = useState(false)
   const [filter, setFilter] = useState<'all' | 'public' | 'private'>('all')
+  const [mediaFilter, setMediaFilter] = useState<'all' | 'image' | 'video' | 'audio'>('all')
+  const [showFilters, setShowFilters] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const isOwner = user?.id === galleryProfile?.id
 
@@ -63,21 +65,21 @@ export const GalleryPage = () => {
 
       setProfileLoading(true)
       const profile = await getProfileByUsername(username)
-      
+
       if (!profile) {
         navigate('/404')
         return
       }
 
       setGalleryProfile(profile)
-      
+
       // Load artworks based on ownership
       if (user?.id === profile.id) {
         await fetchArtworksByUserId(profile.id)
       } else {
         await fetchPublicArtworks(profile.id)
       }
-      
+
       setProfileLoading(false)
     }
 
@@ -91,15 +93,44 @@ export const GalleryPage = () => {
 
   // Filter artworks
   const filteredArtworks = artworks.filter(artwork => {
-    if (filter === 'all') return true
-    if (filter === 'public') return artwork.is_public
-    if (filter === 'private') return !artwork.is_public
-    return true
+    // Privacy Filter
+    let matchesPrivacy = true
+    if (filter === 'public') matchesPrivacy = artwork.is_public
+    if (filter === 'private') matchesPrivacy = !artwork.is_public
+
+    if (!matchesPrivacy) return false
+
+    // Media Filter
+    let matchesMedia = true
+    const isVideo = artwork.image_url.match(/\.(mp4|webm|ogg|mov)$/i)
+    const isAudio = artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)
+
+    if (mediaFilter === 'video') matchesMedia = !!isVideo
+    else if (mediaFilter === 'audio') matchesMedia = !!isAudio
+    else if (mediaFilter === 'image') matchesMedia = !isVideo && !isAudio
+
+    if (!matchesMedia) return false
+
+    // Search Filter
+    const query = searchQuery.toLowerCase()
+    const matchesSearch = (
+      (artwork.title?.toLowerCase().includes(query)) ||
+      (artwork.description?.toLowerCase().includes(query))
+    )
+    
+    return matchesSearch
   })
+
+  const mediaCounts = {
+    all: artworks.length,
+    image: artworks.filter(a => !a.image_url.match(/\.(mp4|webm|ogg|mov|mp3|wav|m4a|aac)$/i)).length,
+    video: artworks.filter(a => a.image_url.match(/\.(mp4|webm|ogg|mov)$/i)).length,
+    audio: artworks.filter(a => a.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)).length
+  }
 
   const handleUpdateLayout = async (layout: 'grid' | 'masonry' | 'editorial') => {
     if (!isOwner || !galleryProfile) return
-    
+
     try {
       setIsUpdatingLayout(true)
       await createOrUpdateProfile({
@@ -118,10 +149,10 @@ export const GalleryPage = () => {
   if (profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background dark:bg-neutral-950">
-         <motion.div 
+         <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full" 
+            className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full"
           />
       </div>
     )
@@ -141,7 +172,7 @@ export const GalleryPage = () => {
               Retour
             </button>
           )}
-          
+
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -159,13 +190,13 @@ export const GalleryPage = () => {
                 {isOwner ? 'Collection personnelle d\'œuvres et d\'intentions.' : galleryProfile?.bio || 'Collection d\'œuvres de ' + galleryProfile?.username}
               </p>
             </motion.div>
-            
+
             {isOwner && (
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 onClick={() => setShowUploadModal(true)}
-                className="px-8 py-4 border-[0.5px] border-neutral-200 dark:border-neutral-800 hover:border-purple-600/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all duration-500 flex items-center gap-3 group"
+                className="px-8 py-4 border border-black dark:border-white hover:border-purple-600/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all duration-500 flex items-center gap-3 group"
               >
                 <Plus className="w-4 h-4 text-neutral-400 group-hover:text-purple-600" />
                 <span className="text-xs uppercase tracking-[0.3em] font-medium text-neutral-600 dark:text-neutral-300">Nouvelle Oeuvre</span>
@@ -174,32 +205,125 @@ export const GalleryPage = () => {
           </div>
         </div>
 
-        {/* Filters */}
-        {isOwner && artworks.length > 0 && (
-          <div className="flex gap-8 mb-16 border-b border-neutral-100 dark:border-neutral-900 pb-4">
-            {[
-              { id: 'all', label: 'Tous', count: artworks.length },
-              { id: 'public', label: 'Publiques', count: artworks.filter(a => a.is_public).length },
-              { id: 'private', label: 'Privées', count: artworks.filter(a => !a.is_public).length }
-            ].map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setFilter(f.id as any)}
-                className={`text-[10px] uppercase tracking-[0.3em] transition-all duration-500 relative pb-4 ${
-                  filter === f.id
-                    ? 'text-purple-600'
-                    : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'
+        {/* Search & Visibility */}
+        {artworks.length > 0 && (
+          <div className="mb-12 space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              {/* Search Bar */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                className="relative max-w-md w-full"
+              >
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Rechercher dans votre galerie..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/50 dark:bg-neutral-900/50 border-[0.5px] border-neutral-200 dark:border-neutral-800 rounded-sm py-3 pl-12 pr-4 text-sm font-light focus:outline-none focus:border-purple-600/30 transition-colors placeholder:text-neutral-400"
+                />
+              </motion.div>
+
+              {/* Media Filter Toggle */}
+              <motion.button
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-3 px-6 py-3 border-[0.5px] transition-all duration-500 rounded-sm self-start md:self-auto ${
+                  showFilters || mediaFilter !== 'all'
+                    ? 'border-purple-600/50 bg-purple-50/50 dark:bg-purple-900/10 text-purple-600'
+                    : 'border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:border-neutral-400 dark:hover:border-neutral-600'
                 }`}
               >
-                {f.label} ({f.count})
-                {filter === f.id && (
-                  <motion.div 
-                    layoutId="activeFilter"
-                    className="absolute bottom-[-1px] left-0 right-0 h-px bg-purple-600" 
-                  />
-                )}
-              </button>
-            ))}
+                <SlidersHorizontal size={14} />
+                <span className="text-[10px] uppercase tracking-[0.3em] font-medium">
+                  Filtrer
+                </span>
+              </motion.button>
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-neutral-100 dark:border-neutral-900 pb-6">
+              {/* Privacy Filters (Owner only) - Always Visible */}
+              {isOwner ? (
+                <div className="flex gap-8">
+                  {[
+                    { id: 'all', label: 'Tous', count: artworks.length },
+                    { id: 'public', label: 'Publiques', count: artworks.filter(a => a.is_public).length },
+                    { id: 'private', label: 'Privées', count: artworks.filter(a => !a.is_public).length }
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => setFilter(f.id as any)}
+                      className={`text-[10px] uppercase tracking-[0.3em] transition-all duration-500 relative pb-2 ${
+                        filter === f.id
+                          ? 'text-purple-600'
+                          : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'
+                      }`}
+                    >
+                      {f.label} ({f.count})
+                      {filter === f.id && (
+                        <motion.div
+                          layoutId="activeFilter"
+                          className="absolute bottom-[-1px] left-0 right-0 h-px bg-purple-600"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div /> // Spacer for non-owners to push filter button to the right
+              )}
+
+              {/* Media Filter Toggle */}
+            </div>
+
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] as any }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2">
+                    {/* Media Type Filters */}
+                    <div className="space-y-4">
+                      <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400 block ml-1">Type de média</span>
+                      <div className="flex flex-wrap gap-8 border-b border-neutral-100 dark:border-neutral-900 pb-4">
+                       {[
+                          { id: 'image', label: 'Photos', icon: Camera, count: mediaCounts.image },
+                          { id: 'video', label: 'Vidéos', icon: Play, count: mediaCounts.video },
+                          { id: 'audio', label: 'Audios', icon: Music, count: mediaCounts.audio }
+                        ].map((f) => (
+                          <button
+                            key={f.id}
+                            onClick={() => setMediaFilter(f.id as any)}
+                            className={`flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] transition-all duration-500 relative pb-4 group ${
+                              mediaFilter === f.id
+                                ? 'text-purple-600'
+                                : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'
+                            }`}
+                          >
+                            <f.icon className={`w-3 h-3 transition-colors ${mediaFilter === f.id ? 'text-purple-600' : 'text-neutral-400 group-hover:text-neutral-600'}`} />
+                            {f.label} ({f.count})
+                            {mediaFilter === f.id && (
+                              <motion.div
+                                layoutId="activeMediaFilter"
+                                className="absolute bottom-[-1px] left-0 right-0 h-px bg-purple-600"
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
@@ -226,7 +350,7 @@ export const GalleryPage = () => {
                 >
                   <l.icon size={14} />
                   {galleryProfile?.gallery_layout === l.id && (
-                    <motion.div 
+                    <motion.div
                       layoutId="activeLayoutTab"
                       className="absolute inset-0 border border-purple-500/20 bg-purple-500/5 rounded-sm"
                     />
@@ -253,10 +377,10 @@ export const GalleryPage = () => {
                 exit={{ opacity: 0 }}
                 className="flex items-center justify-center py-48"
               >
-                <motion.div 
+                <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                  className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full" 
+                  className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full"
                 />
               </motion.div>
             ) : filteredArtworks.length === 0 ? (
@@ -268,63 +392,67 @@ export const GalleryPage = () => {
                 className="text-center py-48"
               >
                 <p className="text-neutral-400 dark:text-neutral-500 text-xs font-light uppercase tracking-[0.5em]">
-                  Aucun objet repertorié
+                  Aucun média correspondant
                 </p>
               </motion.div>
             ) : galleryProfile?.gallery_layout === 'masonry' ? (
+              <motion.div
+                key={`masonry-${filter}-${mediaFilter}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}
+              >
                 <MasonryLayout
-                  key="masonry"
                   artworks={filteredArtworks}
-                  onArtworkClick={(artwork) => {
-                    setSelectedArtwork(artwork)
-                    if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
-                      setShowAudioModal(true)
-                    }
-                  }}
+                  onArtworkClick={setSelectedArtwork}
                   isOwner={isOwner}
                 />
-              ) : galleryProfile?.gallery_layout === 'editorial' ? (
+              </motion.div>
+            ) : galleryProfile?.gallery_layout === 'editorial' ? (
+              <motion.div
+                key={`editorial-${filter}-${mediaFilter}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}
+              >
                 <EditorialLayout
-                  key="editorial"
                   artworks={filteredArtworks}
-                  onArtworkClick={(artwork) => {
-                    setSelectedArtwork(artwork)
-                    if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
-                      setShowAudioModal(true)
-                    }
-                  }}
+                  onArtworkClick={setSelectedArtwork}
                   isOwner={isOwner}
                 />
-              ) : (
-                <motion.div
-                  key={`grid-${filter}`}
-                  variants={container}
-                  initial="hidden"
-                  animate="show"
-                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
-                >
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`grid-${filter}-${mediaFilter}`}
+                variants={container}
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
+              >
+                <AnimatePresence mode="popLayout">
                   {filteredArtworks.map((artwork) => (
                     <motion.div
                       key={artwork.id}
                       variants={item}
-                      layout // Add layout prop for smoother reordering if needed
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
                       className="w-full"
                     >
                       <GalleryArtworkCard
                         artwork={artwork}
-                        onClick={() => {
-                          setSelectedArtwork(artwork)
-                          if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
-                            setShowAudioModal(true)
-                          }
-                        }}
-                        isOwner={isOwner}
+                        onClick={() => setSelectedArtwork(artwork)}
+                       isOwner={isOwner}
                       />
                     </motion.div>
                   ))}
-                </motion.div>
-              )}
+                </AnimatePresence>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
@@ -343,12 +471,10 @@ export const GalleryPage = () => {
         artwork={selectedArtwork!}
         isOpen={!!selectedArtwork && !!selectedArtwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)}
         onClose={() => {
-          setShowAudioModal(false)
           setSelectedArtwork(null)
         }}
         onDelete={isOwner && selectedArtwork ? async () => {
           await deleteArtwork(selectedArtwork.id)
-          setShowAudioModal(false)
           setSelectedArtwork(null)
         } : undefined}
         onUpdate={isOwner && selectedArtwork ? async (fields: Partial<Artwork>) => {

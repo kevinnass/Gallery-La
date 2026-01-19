@@ -11,7 +11,7 @@ export const Hero = () => {
           className="mb-8"
         >
           <span className="text-[12px] uppercase tracking-[0.5em] text-neutral-500 dark:text-neutral-400 font-medium">
-            Partage et Decouverte
+             Bienvenue dans la
           </span>
         </motion.div>
 
@@ -31,7 +31,7 @@ export const Hero = () => {
           className="mt-6 max-w-xl mx-auto"
         >
           <p className="text-sm md:text-base text-neutral-500 dark:text-neutral-400 font-light leading-relaxed tracking-wide">
-            Découvrez ou partagez vos créations.
+            Une gallerie pour découvrir et partager vos créations.
           </p>
         </motion.div>
         
