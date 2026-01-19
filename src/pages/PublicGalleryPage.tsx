@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useArtworks, type ArtworkWithProfile } from '@/hooks/useArtworks'
-import { ArtworkCard } from '@/components/artworks/ArtworkCard'
+import { GalleryArtworkCard } from '@/components/artworks/GalleryArtworkCard'
 import { ArtworkLightbox } from '@/components/artworks/ArtworkLightbox'
 import { AudioModal } from '@/components/artworks/AudioModal'
 
@@ -11,14 +11,21 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.05,
+      staggerChildren: 0.1,
     },
   },
 }
 
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.23, 1, 0.32, 1]
+    }
+  },
 }
 
 export const PublicGalleryPage = () => {
@@ -40,26 +47,40 @@ export const PublicGalleryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors pt-20 pb-20 md:pb-0">
-      <div className="container mx-auto max-w-7xl px-4 py-12">
+    <div className="relative min-h-screen bg-background dark:bg-neutral-950 transition-colors pt-32 pb-20 selection:bg-purple-500/30">
+      <div className="container mx-auto max-w-7xl px-4 relative z-10">
         {/* Page Header */}
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
-            Galerie Publique
-          </h1>
-          <p className="text-lg text-neutral-600 dark:text-neutral-400">
-            Découvrez les créations de notre communauté d'artistes
-          </p>
+       <div className="mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-400 dark:text-neutral-500 font-medium mb-4 block">
+              Exposition
+            </span>
+            <h1 className="text-5xl md:text-7xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight mb-6">
+              La Galerie
+            </h1>
+            <div className="w-12 h-[1px] bg-purple-600/30 mb-8" />
+            <p className="text-neutral-500 dark:text-neutral-400 font-light text-xl max-w-2xl leading-relaxed">
+              Découvrez les œuvres des artistes.
+            </p>
+          </motion.div>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-32">
-            <div className="w-12 h-12 border-4 border-neutral-300 dark:border-neutral-700 border-t-neutral-700 dark:border-t-neutral-300 rounded-full animate-spin" />
+          <div className="flex items-center justify-center py-48">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full" 
+            />
           </div>
         ) : publicArtworks.length === 0 ? (
-          <div className="text-center py-32">
-            <p className="text-neutral-600 dark:text-neutral-400 text-lg">
-              Aucune œuvre publique pour le moment
+          <div className="text-center py-48">
+            <p className="text-neutral-400 dark:text-neutral-500 text-xs font-light uppercase tracking-[0.5em]">
+              Séléction vide
             </p>
           </div>
         ) : (
@@ -67,26 +88,18 @@ export const PublicGalleryPage = () => {
             variants={container}
             initial="hidden"
             animate="show"
-            className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
           >
             <AnimatePresence mode="popLayout">
-              {publicArtworks.map((artwork, index) => (
+              {publicArtworks.map((artwork) => (
                 <motion.div
                   key={artwork.id}
                   variants={item}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ 
-                    delay: index * 0.05,
-                    duration: 0.4
-                  }}
-                  className="break-inside-avoid mb-6"
+                  className="w-full"
                 >
-                  <ArtworkCard
+                  <GalleryArtworkCard
                     artwork={artwork}
                     onClick={() => setSelectedArtwork(artwork)}
-                    isOwner={false}
                     artistName={artwork.profile?.username}
                     onArtistClick={handleArtistClick}
                   />
@@ -97,7 +110,7 @@ export const PublicGalleryPage = () => {
         )}
       </div>
 
-      {/* Audio Modal */}
+      {/* Modals remain the same */}
       {selectedArtwork && selectedArtwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i) ? (
         <AudioModal
           artwork={selectedArtwork}
@@ -108,7 +121,6 @@ export const PublicGalleryPage = () => {
           onArtistClick={handleArtistClick}
         />
       ) : (
-        /* Lightbox for images and videos */
         <ArtworkLightbox
           artwork={selectedArtwork}
           isOpen={!!selectedArtwork}

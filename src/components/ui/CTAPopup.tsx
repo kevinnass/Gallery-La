@@ -32,8 +32,8 @@ export const CTAPopup = () => {
 
         {/* Content */}
         <div className="pr-6 sm:pr-8">
-          <h3 className="text-sm sm:text-base font-semibold text-foreground dark:text-gray-300 mb-3">
-            partagez et présentez vos travaux créatifs
+          <h3 className="text-sm sm:text-base font-semibold text-center text-foreground dark:text-gray-300 mb-3">
+            Partagez et présentez vos travaux créatifs
           </h3>
           
           {/* CTA Button */}
@@ -41,7 +41,7 @@ export const CTAPopup = () => {
             to="/auth"
             className="block w-full px-4 py-2.5 sm:py-3 text-center text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-all hover:opacity-90 hover:scale-105"
           >
-            S'inscrire
+            Connectez-vous
           </Link>
         </div>
       </div>

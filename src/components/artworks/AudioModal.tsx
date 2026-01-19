@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trash2, Eye, EyeOff, Globe, Lock, Edit2, Check } from 'lucide-react'
+import { X, Trash2, MoreVertical } from 'lucide-react'
 import type { Artwork } from '@/hooks/useArtworks'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Input } from '@/components/ui/Input'
 
 interface AudioModalProps {
   artwork: Artwork | null
@@ -54,6 +53,8 @@ export const AudioModal = ({
       await onUpdate({ title: editedTitle })
       setLocalArtwork(prev => prev ? ({ ...prev, title: editedTitle }) : null)
       setIsEditingTitle(false)
+    } catch (err) {
+      console.error('Error saving title:', err)
     } finally {
       setIsUpdating(false)
     }
@@ -66,6 +67,8 @@ export const AudioModal = ({
       await onUpdate({ description: editedDesc })
       setLocalArtwork(prev => prev ? ({ ...prev, description: editedDesc }) : null)
       setIsEditingDesc(false)
+    } catch (err) {
+      console.error('Error saving description:', err)
     } finally {
       setIsUpdating(false)
     }
@@ -78,6 +81,8 @@ export const AudioModal = ({
       const newStatus = !localArtwork.is_public
       await onUpdate({ is_public: newStatus })
       setLocalArtwork(prev => prev ? ({ ...prev, is_public: newStatus }) : null)
+    } catch (err) {
+      console.error('Error toggling visibility:', err)
     } finally {
       setIsUpdating(false)
     }
@@ -89,6 +94,9 @@ export const AudioModal = ({
     try {
       await onDelete()
       setShowConfirmDelete(false)
+      onClose()
+    } catch (err) {
+      console.error('Error deleting audio:', err)
     } finally {
       setIsDeleting(false)
     }
@@ -105,293 +113,212 @@ export const AudioModal = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
+              className="fixed inset-0 bg-white/95 dark:bg-neutral-950/95 z-[60] backdrop-blur-xl transition-colors"
             />
 
-            {/* Modal */}
-            <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="relative w-full max-w-2xl bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl overflow-hidden"
+            {/* Layout Wrapper */}
+            <div className="fixed inset-0 z-[70] flex flex-col md:flex-row h-screen">
+              
+              {/* Close Button */}
+              <motion.button
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={onClose}
+                className="absolute top-8 right-8 z-[80] p-4 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                disabled={isUpdating || isDeleting}
               >
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-800">
-                  <div className="flex items-center gap-3">
-                    {/* Public/Private Status Badge (Top Left) */}
-                    {localArtwork.is_public ? (
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
-                        <Globe className="w-3 h-3" />
-                        <span>Public</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-full text-xs font-medium">
-                        <Lock className="w-3 h-3" />
-                        <span>Privé</span>
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors"
-                  >
-                    <X className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
-                  </button>
-                </div>
+                <X size={24} />
+              </motion.button>
 
-                {/* Content */}
-                <div className="p-8">
-                  {/* Audio Player Card - Exact Upload Modal Design */}
-                  <div className="relative w-full p-8 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl flex flex-col items-center justify-center mb-8">
-                    
-                    {/* Status Overlay Icon */}
-                    <div className="absolute top-4 right-4">
-                      {localArtwork.is_public ? (
-                        <Globe className="w-6 h-6 text-purple-900/40 dark:text-purple-100/40" />
-                      ) : (
-                        <Lock className="w-6 h-6 text-purple-900/40 dark:text-purple-100/40" />
-                      )}
-                    </div>
+              {/* Left Side: Audio Player Card (70%) */}
+              <div className="flex-[7] relative flex items-center justify-center p-8 md:p-12 lg:p-24" onClick={onClose}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                  className="relative z-10 w-full max-w-2xl bg-white dark:bg-neutral-950 p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,0.05)] dark:shadow-[0_0_100px_rgba(0,0,0,0.2)]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="absolute inset-2 border-[0.5px] border-neutral-100 dark:border-neutral-900 pointer-events-none" />
 
-                    {/* Cover Image or Default Icon */}
-                    <div className="relative group mb-4">
+                  <div className="space-y-12">
+                     {/* Cover Image Area */}
+                    <div className="relative group mx-auto w-full aspect-square max-w-[400px] border-[0.5px] border-neutral-100 dark:border-neutral-900 p-4">
+                       <div className="absolute inset-2 border-[0.5px] border-neutral-50 dark:border-neutral-900 pointer-events-none" />
+                      
                       {localArtwork.cover_image_url ? (
-                        <div className="w-full max-w-md aspect-square rounded-xl overflow-hidden relative">
-                          <img
-                            src={localArtwork.cover_image_url}
-                            alt={localArtwork.title || 'Audio cover'}
-                            className="w-full h-full object-cover"
-                          />
-                          {isOwner && onUpdateCover && (
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <label className="cursor-pointer">
-                                <span className="px-4 py-2 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-2">
-                                  <Edit2 className="w-4 h-4" />
-                                  Changer la cover
-                                </span>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={async (e) => {
-                                    const file = e.target.files?.[0]
-                                    if (file && file.type.startsWith('image/')) {
-                                      setIsUpdating(true)
-                                      try {
-                                        await onUpdateCover(file)
-                                        // Update local preview
-                                        const reader = new FileReader()
-                                        reader.onloadend = () => {
-                                          setLocalArtwork(prev => prev ? {
-                                            ...prev,
-                                            cover_image_url: reader.result as string
-                                          } : null)
-                                        }
-                                        reader.readAsDataURL(file)
-                                      } finally {
-                                        setIsUpdating(false)
-                                      }
-                                    }
-                                  }}
-                                  className="hidden"
-                                  disabled={isUpdating}
-                                />
-                              </label>
-                            </div>
-                          )}
-                        </div>
+                        <img
+                          src={localArtwork.cover_image_url}
+                          alt={localArtwork.title || ''}
+                          className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity grayscale hover:grayscale-0 duration-700"
+                        />
                       ) : (
-                        <div className="relative">
-                          <div className="text-6xl mb-4">🎵</div>
-                          {isOwner && onUpdateCover && (
-                            <label className="absolute top-0 right-0 cursor-pointer">
-                              <span className="px-3 py-1.5 bg-neutral-900 dark:bg-neutral-50 text-white dark:text-neutral-900 rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-1.5 text-sm">
-                                <Edit2 className="w-3 h-3" />
-                                Ajouter cover
-                              </span>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={async (e) => {
-                                  const file = e.target.files?.[0]
-                                  if (file && file.type.startsWith('image/')) {
-                                    setIsUpdating(true)
-                                    try {
-                                      await onUpdateCover(file)
-                                      // Update local preview
-                                      const reader = new FileReader()
-                                      reader.onloadend = () => {
-                                        setLocalArtwork(prev => prev ? {
-                                          ...prev,
-                                          cover_image_url: reader.result as string
-                                        } : null)
-                                      }
-                                      reader.readAsDataURL(file)
-                                    } finally {
-                                      setIsUpdating(false)
-                                    }
-                                  }
-                                }}
-                                className="hidden"
-                                disabled={isUpdating}
-                              />
-                            </label>
-                          )}
+                        <div className="w-full h-full bg-neutral-50 dark:bg-neutral-900/50 flex flex-col items-center justify-center space-y-4">
+                          <span className="text-6xl opacity-20">🎵</span>
+                          <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-300">Aucune_Cover</span>
+                        </div>
+                      )}
+
+                      {isOwner && onUpdateCover && (
+                        <div className="absolute inset-0 bg-white/60 dark:bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
+                           <label className="cursor-pointer">
+                            <span className="px-6 py-2 border-[0.5px] border-neutral-900 dark:border-white text-[10px] uppercase tracking-widest font-medium hover:bg-neutral-900 hover:text-white dark:hover:bg-white dark:hover:text-neutral-950 transition-all">
+                              {isUpdating ? 'Chargement...' : 'Télécharger une Cover'}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                  setIsUpdating(true)
+                                  await onUpdateCover(file)
+                                  setIsUpdating(false)
+                                }
+                              }}
+                              className="hidden"
+                              disabled={isUpdating}
+                            />
+                          </label>
                         </div>
                       )}
                     </div>
-                    
-                    
-                    {/* Editable Title inside Card */}
-                    {isEditingTitle ? (
-                      <div className="flex items-center gap-2 mb-4 w-full max-w-md">
-                        <Input
-                          value={editedTitle}
-                          onChange={(e) => setEditedTitle(e.target.value)}
-                          className="bg-white/50 dark:bg-black/20 text-center font-medium border-transparent focus:bg-white dark:focus:bg-black/40"
-                          placeholder="Titre de l'œuvre"
-                          autoFocus
-                        />
-                        <button
-                          onClick={handleSaveTitle}
-                          disabled={isUpdating}
-                          className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 disabled:opacity-50"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div 
-                        onClick={() => isOwner && setIsEditingTitle(true)}
-                        className={`group relative text-neutral-700 dark:text-neutral-300 font-medium mb-4 text-center ${isOwner ? 'cursor-pointer hover:bg-black/5 dark:hover:bg-white/10 px-4 py-1 rounded-lg transition-colors' : ''}`}
-                      >
-                        {localArtwork.title || 'Sans titre'}
-                        {isOwner && (
-                          <div className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Edit2 className="w-3 h-3 text-neutral-400" />
-                          </div>
-                        )}
-                      </div>
-                    )}
 
-                    {/* Audio Player */}
-                    <div className="w-full max-w-md">
-                      <audio 
+                    {/* Simple Native Player Styled Minimalist */}
+                    <div className="w-full max-w-[400px] mx-auto space-y-4">
+                       <audio 
                         src={localArtwork.image_url} 
                         controls 
-                        controlsList="nodownload"
-                        className="w-full"
+                        className="w-full opacity-60 hover:opacity-100 transition-opacity"
                       />
+                      <div className="flex justify-between items-center px-1">
+                        <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400">Flux_Audio</span>
+                        <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400">Flux_Encodé</span>
+                      </div>
                     </div>
-
-                    {/* Artist Name Button */}
-                    {artistName && onArtistClick && (
-                      <motion.button
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        onClick={() => onArtistClick(artistName)}
-                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-purple-500 hover:bg-purple-600 text-white shadow-lg transition-colors"
-                      >
-                        👤 Voir la galerie de @{artistName}
-                      </motion.button>
-                    )}
                   </div>
+                </motion.div>
+              </div>
 
-                  {/* Editable Description */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3  className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                        Description
-                      </h3>
-                      {isOwner && !isEditingDesc && (
-                        <button
-                          onClick={() => setIsEditingDesc(true)}
-                          className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 flex items-center gap-1"
+              {/* Right Side: Metadata (30%) */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="flex-[3] bg-white dark:bg-neutral-950 border-l-[0.5px] border-neutral-100 dark:border-neutral-900 z-10 flex flex-col pt-32 p-12 overflow-y-auto"
+              >
+                 <div className="space-y-12">
+                   {/* Header Stats */}
+
+                    {/* Title and Description */}
+                    <div className="space-y-6">
+                      {isEditingTitle && isOwner ? (
+                        <input
+                          autoFocus
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          onBlur={handleSaveTitle}
+                          onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()}
+                          className="w-full bg-transparent border-b border-purple-600 text-4xl font-display font-medium focus:outline-none"
+                          disabled={isUpdating}
+                        />
+                      ) : (
+                        <h2 
+                          onClick={() => isOwner && setIsEditingTitle(true)}
+                          className={`text-4xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
                         >
-                          <Edit2 className="w-3 h-3" />
-                          Modifier
-                        </button>
+                          {localArtwork.title || 'Boucle_Sans_Titre'}
+                        </h2>
                       )}
-                    </div>
 
-                    {isEditingDesc ? (
-                      <div className="relative">
+                      <div className="w-12 h-[1px] bg-purple-600/30" />
+
+                      {isEditingDesc && isOwner ? (
                         <textarea
+                          autoFocus
                           value={editedDesc}
                           onChange={(e) => setEditedDesc(e.target.value)}
-                          className="w-full p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl border-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 min-h-[100px] resize-none"
-                          placeholder="Ajouter une description..."
-                          autoFocus
+                          onBlur={handleSaveDesc}
+                          className="w-full bg-neutral-50 dark:bg-neutral-900/50 p-4 font-light text-lg leading-relaxed focus:outline-none border-[0.5px] border-neutral-200 dark:border-neutral-800 min-h-[150px]"
+                          disabled={isUpdating}
                         />
-                        <div className="absolute bottom-3 right-3 flex gap-2">
-                          <button
-                            onClick={() => setIsEditingDesc(false)}
-                            className="text-xs text-neutral-500 hover:text-neutral-700 px-3 py-1.5"
+                      ) : (
+                        <p 
+                          onClick={() => isOwner && setIsEditingDesc(true)}
+                          className={`text-neutral-500 dark:text-neutral-400 font-light text-lg leading-relaxed whitespace-pre-wrap ${isOwner ? 'hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 cursor-text p-2 -m-2 transition-colors' : ''}`}
+                        >
+                          {localArtwork.description || (isOwner ? "Ajouter une description audio..." : "")}
+                        </p>
+                      )}
+                    </div>
+
+
+
+                    {/* Sidebar Links & Control */}
+                    <div className="pt-12 border-t border-neutral-100 dark:border-neutral-900 space-y-8">
+                       {artistName && (
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase tracking-[0.4em] text-neutral-400">Compositeur / Artiste</span>
+                          <p 
+                            onClick={() => onArtistClick?.(artistName)}
+                            className="text-sm font-medium hover:text-purple-600 cursor-pointer transition-colors"
                           >
-                            Annuler
-                          </button>
-                          <button
-                            onClick={handleSaveDesc}
-                            disabled={isUpdating}
-                            className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-3 py-1.5 rounded-lg text-xs font-medium hover:opacity-90 disabled:opacity-50"
-                          >
-                            Enregistrer
-                          </button>
+                             @{artistName}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="space-y-1">
+                        <span className="text-[9px] uppercase tracking-[0.4em] text-neutral-400">Accès</span>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-1.5 h-1.5 rounded-full ${localArtwork.is_public ? 'bg-emerald-500' : 'bg-neutral-300'}`} />
+                          <p className="text-sm font-medium uppercase tracking-widest text-neutral-600 dark:text-neutral-400">
+                            {localArtwork.is_public ? 'Publique' : 'Privée'}
+                          </p>
                         </div>
                       </div>
-                    ) : (
-                      <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed whitespace-pre-wrap">
-                        {localArtwork.description || (isOwner ? "Aucune description. Cliquez pour en ajouter une." : "")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Footer Controls (Owner only) */}
-                {isOwner && (
-                  <div className="flex items-center justify-between p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-                    <button
-                      onClick={handleTogglePublic}
-                      disabled={isUpdating}
-                      className="flex items-center gap-2 px-4 py-2 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
-                    >
-                      {localArtwork.is_public ? (
-                        <>
-                          <EyeOff className="w-4 h-4" />
-                          Rendre privé
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-4 h-4" />
-                          Rendre public
-                        </>
+                      {isOwner && (
+                        <div className="space-y-4 ">
+                           <button 
+                            onClick={handleTogglePublic}
+                            disabled={isUpdating}
+                            className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                          >
+                             {localArtwork.is_public ? 'Rendre privé' : 'Rendre public'}
+                             <div className="w-8 h-px bg-neutral-100 dark:bg-neutral-800 group-hover:w-12 transition-all" />
+                          </button>
+                          
+                          <button 
+                            onClick={() => setShowConfirmDelete(true)}
+                            disabled={isUpdating || isDeleting}
+                            className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                          >
+                             Supprimer
+                             <Trash2 size={12} className="opacity-40" />
+                          </button>
+                        </div>
                       )}
-                    </button>
+                    </div>
+                 </div>
 
-                    <button
-                      onClick={() => setShowConfirmDelete(true)}
-                      className="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Supprimer
-                    </button>
+                 <div className="mt-auto pt-20 flex justify-between items-center text-neutral-300 dark:text-neutral-700">
+                    <span className="text-[9px] uppercase tracking-[0.5em]">Registre_Audio / La</span>
+                    <span className="text-[9px] tracking-tighter">V.01-26</span>
                   </div>
-                )}
               </motion.div>
             </div>
           </>
         )}
       </AnimatePresence>
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showConfirmDelete}
         onClose={() => setShowConfirmDelete(false)}
         onConfirm={handleDelete}
-        title="Supprimer l'œuvre ?"
-        message="Cette action est irréversible. L'audio sera définitivement supprimé."
-        confirmText="Supprimer"
+        title="Détruire le fichier audio ?"
+        message="Ceci supprimera définitivement l'objet audio de l'archive numérique. Cette action est irréversible."
+        confirmText="Confirmer la destruction"
         cancelText="Annuler"
         isLoading={isDeleting}
       />

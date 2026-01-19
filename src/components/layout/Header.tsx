@@ -30,7 +30,7 @@ export const Header = () => {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background/95 dark:bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800 transition-colors">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background/95 dark:bg-neutral-950/95 backdrop-blur-sm border-neutral-200 dark:border-neutral-800 transition-colors">
       <nav className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-7xl">
         {/* Logo */}
         <Link to="/" className="text-lg font-medium text-foreground dark:text-gray-300 cursor-pointer flex z-50">

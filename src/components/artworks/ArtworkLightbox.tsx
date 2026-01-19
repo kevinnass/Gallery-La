@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trash2, Eye, EyeOff, MoreVertical, FileText, Type } from 'lucide-react'
+import { X, Trash2, Eye, EyeOff, MoreVertical } from 'lucide-react'
 import type { Artwork } from '@/hooks/useArtworks'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
@@ -26,7 +26,6 @@ export const ArtworkLightbox = ({
   onArtistClick
 }: ArtworkLightboxProps) => {
   const [localArtwork, setLocalArtwork] = useState<Artwork | null>(null)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [editingField, setEditingField] = useState<'title' | 'description' | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -108,264 +107,164 @@ export const ArtworkLightbox = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with Blur */}
+          {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            animate={{ opacity: 1, backdropFilter: 'blur(40px)' }}
-            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/20 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white/95 dark:bg-neutral-950/95 z-50 transition-colors backdrop-blur-xl"
             onClick={onClose}
           />
 
-          {/* Lightbox Container */}
-          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 gap-4" onClick={onClose}>
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
-              
-              {/* Top Bar - Close + Badge */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  {/* Public/Private Badge */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                  >
-                    <span
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-2xl shadow-xl border ${
-                        localArtwork.is_public
-                          ? 'bg-emerald-500/90 text-white border-emerald-400/20'
-                          : 'bg-neutral-800/90 dark:bg-neutral-200/90 text-white dark:text-neutral-900 border-neutral-700/20 dark:border-neutral-300/20'
-                      }`}
-                    >
-                      {localArtwork.is_public ? '🌐 Public' : '🔒 Privé'}
-                    </span>
-                  </motion.div>
+          <div className="fixed inset-0 z-50 flex flex-col md:flex-row h-screen">
+            {/* Close Button - Floats Top Right */}
+            <motion.button
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              onClick={onClose}
+              className="absolute top-8 right-8 z-[60] p-4 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </motion.button>
 
-                  {/* Artist Name Button */}
-                  {artistName && onArtistClick && (
-                    <motion.button
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.15 }}
-                      onClick={() => onArtistClick(artistName)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-2xl shadow-xl border bg-purple-500/90 hover:bg-purple-600/90 text-white border-purple-400/20 transition-colors"
-                    >
-                      👤 @{artistName}
-                    </motion.button>
-                  )}
-                </div>
-
-                {/* Close Button */}
-                <motion.button
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 }}
-                  onClick={onClose}
-                  className="w-10 h-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-2xl rounded-full shadow-xl flex items-center justify-center hover:bg-white dark:hover:bg-neutral-900 transition-all border border-white/20 dark:border-neutral-700/20"
-                >
-                  <X className="w-5 h-5 text-neutral-900 dark:text-white" />
-                </motion.button>
-              </div>
-
-              {/* Artwork */}
+            {/* Left: Media Area (70%) */}
+            <div className="flex-[7] relative flex items-center justify-center p-8 md:p-12 lg:p-20 overflow-hidden" onClick={onClose}>
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="relative"
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                className="relative z-10 max-h-full max-w-full flex items-center justify-center p-4 bg-white dark:bg-neutral-950 shadow-[0_0_100px_rgba(0,0,0,0.05)] dark:shadow-[0_0_100px_rgba(0,0,0,0.2)]"
+                onClick={(e) => e.stopPropagation()}
               >
+                {/* Thin Inner Border Mimicking the Card */}
+                <div className="absolute inset-2 border-[0.5px] border-neutral-100 dark:border-neutral-900 pointer-events-none" />
+
                 {localArtwork.image_url.match(/\.(mp4|webm|ogg|mov)$/i) ? (
-                  // Video Player
-                  <div className="relative bg-neutral-950 rounded-2xl overflow-hidden shadow-2xl">
-                    <video
-                      src={localArtwork.image_url}
-                      controls
-                      controlsList="nodownload"
-                      className="max-h-[65vh] w-full rounded-2xl"
-                      autoPlay={false}
-                    />
-                  </div>
-                ) : localArtwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i) ? (
-                  // Audio Player - LARGE
-                  <div className="w-full p-16 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl shadow-2xl flex flex-col items-center justify-center min-h-[500px]">
-                    <div className="text-9xl mb-8">🎵</div>
-                    <p className="text-neutral-700 dark:text-neutral-300 font-bold text-4xl mb-12 text-center px-8">{localArtwork.title || 'Sans titre'}</p>
-                    <audio 
-                      src={localArtwork.image_url} 
-                      controls 
-                      controlsList="nodownload"
-                      className="w-full max-w-3xl h-16" 
-                    />
-                  </div>
+                  <video
+                    src={localArtwork.image_url}
+                    controls
+                    controlsList="nodownload"
+                    className="max-h-[80vh] w-auto block"
+                    autoPlay
+                  />
                 ) : (
-                  // Image
                   <img
                     src={localArtwork.image_url}
-                    alt={localArtwork.title || 'Sans titre'}
-                    className="max-h-[65vh] max-w-full rounded-2xl shadow-2xl"
+                    alt={localArtwork.title || ''}
+                    className="max-h-[80vh] w-auto block object-contain"
                   />
                 )}
               </motion.div>
+            </div>
 
-              {/* Bottom Bar - Title + Menu */}
-              <div className="flex items-center justify-between gap-4 mt-4">
-                {/* Title/Description Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex-1 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-2xl rounded-2xl shadow-xl p-4 border border-white/20 dark:border-neutral-700/20"
-                >
-                  {editingField === 'title' ? (
-                    <div className="space-y-3">
+            {/* Right: Info Area (30%) */}
+            <motion.div 
+               initial={{ opacity: 0, x: 20 }}
+               animate={{ opacity: 1, x: 0 }}
+               exit={{ opacity: 0, x: 20 }}
+               className="flex-[3] bg-white dark:bg-neutral-950 border-l-[0.5px] border-neutral-100 dark:border-neutral-900 z-10 flex flex-col pt-32 p-12 overflow-y-auto"
+            >
+              <div className="space-y-12">
+
+                {/* Title and Description */}
+                <div className="space-y-6">
+                  {editingField === 'title' && isOwner ? (
+                    <div className="space-y-4">
                       <input
-                        type="text"
+                        autoFocus
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        autoFocus
-                        className="w-full text-lg font-semibold bg-white/50 dark:bg-neutral-800/50 backdrop-blur-xl border-2 border-neutral-900 dark:border-neutral-50 rounded-xl px-3 py-2 text-neutral-900 dark:text-neutral-50 focus:outline-none"
-                        placeholder="Titre"
+                        onBlur={handleSaveTitle}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle()}
+                        className="w-full bg-transparent border-b border-purple-600 text-4xl font-display font-medium focus:outline-none"
                       />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleSaveTitle}
-                          disabled={isLoading}
-                          className="flex-1 px-3 py-1.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                          Valider
-                        </button>
-                        <button
-                          onClick={() => {
-                            setTitle(localArtwork.title || '')
-                            setEditingField(null)
-                          }}
-                          disabled={isLoading}
-                          className="flex-1 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                          Annuler
-                        </button>
-                      </div>
-                    </div>
-                  ) : editingField === 'description' ? (
-                    <div className="space-y-3">
-                      <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        autoFocus
-                        className="w-full p-3 bg-white/50 dark:bg-neutral-800/50 backdrop-blur-xl border-2 border-neutral-900 dark:border-neutral-50 rounded-xl text-neutral-900 dark:text-neutral-50 focus:outline-none resize-none"
-                        rows={3}
-                        placeholder="Description (optionnelle)"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleSaveDescription}
-                          disabled={isLoading}
-                          className="flex-1 px-3 py-1.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                          Valider
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDescription(localArtwork.description || '')
-                            setEditingField(null)
-                          }}
-                          disabled={isLoading}
-                          className="flex-1 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                          Annuler
-                        </button>
-                      </div>
                     </div>
                   ) : (
-                    <div>
-                      <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-50">
-                        {localArtwork.title || 'Sans titre'}
-                      </h2>
-                      {localArtwork.description && (
-                        <p className="text-neutral-700 dark:text-neutral-300 text-sm mt-1 line-clamp-2">
-                          {localArtwork.description}
-                        </p>
-                      )}
+                    <h2 
+                      onClick={() => isOwner && setEditingField('title')}
+                      className={`text-4xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
+                    >
+                      {localArtwork.title || 'Sans titre'}
+                    </h2>
+                  )}
+
+                  <div className="w-12 h-[1px] bg-purple-600/30" />
+
+                  {editingField === 'description' && isOwner ? (
+                    <textarea
+                      autoFocus
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      onBlur={handleSaveDescription}
+                      className="w-full bg-neutral-50 dark:bg-neutral-900/50 p-4 font-light text-lg leading-relaxed focus:outline-none border-[0.5px] border-neutral-200 dark:border-neutral-800 min-h-[150px]"
+                    />
+                  ) : (
+                    <p 
+                      onClick={() => isOwner && setEditingField('description')}
+                      className={`text-neutral-500 dark:text-neutral-400 font-light text-lg leading-relaxed whitespace-pre-wrap ${isOwner ? 'hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 cursor-text p-2 -m-2 transition-colors' : ''}`}
+                    >
+                      {localArtwork.description || (isOwner ? "Aucune description fournie. Cliquez pour en ajouter une." : "")}
+                    </p>
+                  )}
+                </div>
+
+                {/* Technical Details Sidebar */}
+                <div className="pt-12 border-t border-neutral-100 dark:border-neutral-900 space-y-8">
+                   {artistName && (
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase tracking-[0.4em] text-neutral-400">Provenance / Artiste</span>
+                      <p 
+                        onClick={() => onArtistClick?.(artistName)}
+                        className="text-sm font-medium hover:text-purple-600 cursor-pointer transition-colors"
+                      >
+                         @{artistName}
+                      </p>
                     </div>
                   )}
-                </motion.div>
+                  
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase tracking-[0.4em] text-neutral-400">Accès</span>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-1.5 h-1.5 rounded-full ${localArtwork.is_public ? 'bg-emerald-500' : 'bg-neutral-300'}`} />
+                      <p className="text-sm font-medium uppercase tracking-widest text-neutral-600 dark:text-neutral-400">
+                        {localArtwork.is_public ? 'Publique' : 'Privée'}
+                      </p>
+                    </div>
+                  </div>
 
-                {/* Edit Menu (Owner only) */}
-                {isOwner && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="relative"
-                  >
-                    <AnimatePresence>
-                      {isMenuOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                          className="absolute bottom-16 right-0 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl p-2 min-w-[220px] border border-white/20 dark:border-neutral-700/20"
-                        >
-                          <button
-                            onClick={() => {
-                              setEditingField('title')
-                              setIsMenuOpen(false)
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-left text-neutral-700 dark:text-neutral-300 hover:bg-white/50 dark:hover:bg-neutral-800/50 rounded-xl transition-all"
-                          >
-                            <Type className="w-4 h-4" />
-                            <span className="text-sm font-medium">Modifier le titre</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditingField('description')
-                              setIsMenuOpen(false)
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-left text-neutral-700 dark:text-neutral-300 hover:bg-white/50 dark:hover:bg-neutral-800/50 rounded-xl transition-all"
-                          >
-                            <FileText className="w-4 h-4" />
-                            <span className="text-sm font-medium">Modifier la description</span>
-                          </button>
-                          <button
-                            onClick={handleTogglePublic}
-                            disabled={isLoading}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-left text-neutral-700 dark:text-neutral-300 hover:bg-white/50 dark:hover:bg-neutral-800/50 rounded-xl transition-all disabled:opacity-50"
-                          >
-                            {localArtwork.is_public ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            <span className="text-sm font-medium">
-                              {localArtwork.is_public ? 'Rendre privé' : 'Rendre public'}
-                            </span>
-                          </button>
-                          <div className="h-px bg-neutral-200/50 dark:bg-neutral-700/50 my-1" />
-                          <button
-                            onClick={() => {
-                              setShowDeleteConfirm(true)
-                              setIsMenuOpen(false)
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-900/10 rounded-xl transition-all"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            <span className="text-sm font-medium">Supprimer</span>
-                          </button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <button
-                      onClick={() => setIsMenuOpen(!isMenuOpen)}
-                      className="w-12 h-12 bg-neutral-900/90 dark:bg-white/90 backdrop-blur-2xl text-white dark:text-neutral-900 rounded-full shadow-xl flex items-center justify-center hover:bg-neutral-900 dark:hover:bg-white transition-all border border-neutral-700/20 dark:border-white/20"
-                    >
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
-                  </motion.div>
-                )}
+                  {isOwner && (
+                    <div className="space-y-4 pt-12">
+                      <button 
+                        onClick={handleTogglePublic}
+                        disabled={isLoading}
+                        className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                      >
+                        {localArtwork.is_public ? 'Rendre privé' : 'Rendre public'}
+                        <div className="w-8 h-px bg-neutral-100 dark:bg-neutral-800 group-hover:w-12 transition-all" />
+                      </button>
+                      
+                      <button 
+                        onClick={() => setShowDeleteConfirm(true)}
+                        disabled={isLoading}
+                        className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                      >
+                        Supprimer
+                        <Trash2 size={12} className="opacity-40" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+
+              {/* Museum Signature Bottom */}
+              <div className="mt-auto pt-20 flex justify-between items-center text-neutral-300 dark:text-neutral-700">
+                <span className="text-[9px] uppercase tracking-[0.5em]">Registre Gallery-La</span>
+                <span className="text-[9px] tracking-tighter">© 2026</span>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Delete Confirmation Dialog */}
           <ConfirmDialog
             isOpen={showDeleteConfirm}
             onClose={() => setShowDeleteConfirm(false)}

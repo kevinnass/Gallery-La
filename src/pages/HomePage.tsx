@@ -1,226 +1,147 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Image, Globe, Users, Sparkles } from 'lucide-react'
 import { Hero } from '@/components/home/Hero'
 
 export const HomePage = () => {
   const navigate = useNavigate()
 
+  const sections = [
+    {
+      title: "Pureté",
+      text: "Chaque pixel est une intention. Chaque œuvre est une émotion.",
+      metadata: ["ID: 001", "MEDIUM: DIGITAL", "PERMANENT COLLECTION"]
+    },
+    {
+      title: "Expérience",
+      text: "Une interface pensée pour laisser place à la contemplation.",
+      metadata: ["ID: 002", "TYPE: IMMERSIVE", "CURATED VIEW"]
+    },
+    {
+      title: "Liberté",
+      text: "Votre espace, vos règles, votre vision du monde.",
+      metadata: ["ID: 003", "ORIGIN: ARTIST OWNED", "DECENTRALIZED"]
+    }
+  ]
+
   return (
-    <div className="min-h-screen bg-background dark:bg-neutral-950 transition-colors overflow-hidden pb-20 md:pb-0">
+    <div className="relative min-h-screen bg-background dark:bg-neutral-950 transition-colors selection:bg-purple-500/30">
       <Hero /> 
       
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full blur-3xl"
-        />
-      </div>
-      
-      {/* Features Section */}
-      <section className="py-10 px-4 relative z-10">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, type: "spring" }}
-              className="inline-block mb-4"
-            >
-            </motion.div>
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
-              Partagez vos créations avec le monde
-            </h2>
-            <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-              Gallery-La est une plateforme moderne pour les artistes qui souhaitent partager leurs œuvres
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="bg-white dark:bg-neutral-900 p-8 border-2 border-black dark:border-white rounded-2xl shadow-lg hover:shadow-2xl transition-all group"
-            >
-              <motion.div 
-                whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
-                transition={{ duration: 0.5 }}
-                className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6"
+      {/* Narrative Section */}
+      <section className="relative px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="space-y-60 py-32">
+            {sections.map((section, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className={`flex flex-col ${index % 2 === 1 ? 'items-end text-right' : 'items-start text-left'}`}
               >
-                <Image className="w-7 h-7 text-white" />
+                <span className="text-xs uppercase tracking-[0.4em] text-neutral-400 mb-6 font-medium">
+                  {`0${index + 1}`}
+                </span>
+                <h2 className="text-4xl md:text-5xl font-display font-medium text-foreground dark:text-white mb-6">
+                  {section.title}
+                </h2>
+                <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 max-w-md font-light leading-relaxed mb-8">
+                  {section.text}
+                </p>
+                
+                {/* Museum Label */}
+                <div className={`flex gap-4 opacity-30 ${index % 2 === 1 ? 'flex-row-reverse' : ''}`}>
+                  {section.metadata.map((meta, i) => (
+                    <span key={i} className="text-[9px] uppercase tracking-[0.2em] font-medium text-neutral-500 dark:text-neutral-400">
+                      {meta}
+                    </span>
+                  ))}
+                </div>
               </motion.div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
-                Créez & Uploadez
-              </h3>
-              <p className="text-neutral-600 dark:text-neutral-400">
-                Partagez vos images, vidéos et fichiers audio. Ajoutez des covers personnalisées pour vos créations audio.
-              </p>
-            </motion.div>
-
-            {/* Feature 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all group"
-            >
-              <motion.div 
-                whileHover={{ rotate: 360, scale: 1.1 }}
-                transition={{ duration: 0.6 }}
-                className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6"
-              >
-                <Globe className="w-7 h-7 text-white" />
-              </motion.div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
-                Public ou Privé
-              </h3>
-              <p className="text-neutral-600 dark:text-neutral-400">
-                Contrôlez la visibilité de vos œuvres. Rendez-les publiques pour le monde ou gardez-les privées.
-              </p>
-            </motion.div>
-
-            {/* Feature 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all group"
-            >
-              <motion.div 
-                whileHover={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 0.5 }}
-                className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-6"
-              >
-                <Users className="w-7 h-7 text-white" />
-              </motion.div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
-                Découvrez & Connectez
-              </h3>
-              <p className="text-neutral-600 dark:text-neutral-400">
-                Explorez les créations d'autres artistes et construisez votre communauté créative.
-              </p>
-            </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4  relative overflow-hidden">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
+      {/* Curated Collection Section - MIMICKING A PHYSICAL GALLERY WALL */}
+      {/* <section className="py-40 px-4 relative z-10">
+        <div className="container mx-auto max-w-6xl">
           <motion.div
-            animate={{
-              backgroundPosition: ["0% 0%", "100% 100%"],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              repeatType: "reverse"
-            }}
-            className="w-full h-full"
-            style={{
-              backgroundImage: "radial-gradient(circle, #000 1px, transparent 1px)",
-              backgroundSize: "50px 50px"
-            }}
-          />
-        </div>
-
-        <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            className="border-t border-neutral-200 dark:border-neutral-800 pt-8 mb-20"
           >
-            <motion.h2 
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-6"
-            >
-              Prêt à découvrir des créations ?
-            </motion.h2>
-            <p className="text-lg text-neutral-600 dark:text-neutral-400 mb-8 max-w-2xl mx-auto">
-              Rejoignez notre communauté d'artistes et commencez à partager vos œuvres dès aujourd'hui
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/gallery')}
-                className="px-8 py-4 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-xl font-medium hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2 group"
+            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-400 font-medium">
+              Séléction Commissaire / Exhibition 2026.01
+            </span>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800 border-[0.5px] border-neutral-200 dark:border-neutral-800">
+            {[1, 2, 3].map((item) => (
+              <motion.div
+                key={item}
+                whileHover={{ backgroundColor: "rgba(147, 51, 234, 0.05)" }}
+                className="bg-background dark:bg-neutral-950 p-12 aspect-[4/5] flex flex-col items-center justify-center relative cursor-crosshair group transition-colors duration-700"
               >
-                Explorer la galerie
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+                <div className="w-full h-full border-[0.5px] border-neutral-100 dark:border-neutral-900 group-hover:border-purple-500/30 transition-colors duration-700 flex items-center justify-center p-8">
+                  <div className="w-12 h-12 border border-neutral-300 dark:border-neutral-700 rounded-full flex items-center justify-center opacity-20 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[8px] uppercase tracking-tighter">+</span>
+                  </div>
+                </div>
+                <div className="absolute bottom-6 left-6 text-left">
+                  <p className="text-[9px] uppercase tracking-[0.3em] font-medium text-neutral-400">Item_{item.toString().padStart(3, '0')}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section> */}
+
+      {/* Subtle CTA Section */}
+      <section className="py-40 px-4 relative z-10">
+        <div className="container mx-auto max-w-3xl text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-medium text-foreground dark:text-white mb-12">
+              Prêt à commencer le voyage ?
+            </h2>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+              {[
+                { name: 'Explorer', path: '/gallery' },
+                { name: 'Artistes', path: '/artists' },
+                { name: 'Rejoindre', path: '/auth' }
+              ].map((item) => (
+                <motion.button
+                  key={item.name}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate(item.path)}
+                  className="group relative"
                 >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.div>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/artists')}
-                className="px-8 py-4 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-xl font-medium hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2 group"
-              >
-                Découvrez les artistes
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.div>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/auth')}
-                className="px-8 py-4 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-xl font-medium hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors border-2 border-neutral-200 dark:border-neutral-700"
-              >
-                Commencer gratuitement
-              </motion.button>
+                  <span className="text-sm uppercase tracking-[0.3em] font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-purple-600 transition-colors">
+                    {item.name}
+                  </span>
+                  <span className="absolute -bottom-2 left-0 w-0 h-px bg-purple-600 transition-all duration-500 group-hover:w-full" />
+                </motion.button>
+              ))}
             </div>
           </motion.div>
         </div>
       </section>
+      
+      {/* Final minimalist signature */}
+      <div className="py-20 text-center opacity-20 hover:opacity-100 transition-opacity duration-1000">
+        <span className="text-[10px] uppercase tracking-[1em] text-neutral-500">
+          Gallery-La — 2026
+        </span>
+      </div>
     </div>
   )
 }
