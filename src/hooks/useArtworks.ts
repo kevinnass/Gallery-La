@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './useAuth'
 
@@ -166,9 +166,8 @@ export const useArtworks = () => {
     }
   }, [])
 
-  useEffect(() => {
-    fetchUserArtworks()
-  }, [fetchUserArtworks])
+  // Removed automatic effect to avoid race conditions and double-fetching.
+  // Components should call fetchUserArtworks() or other fetch methods explicitly.
 
   const uploadArtwork = async (data: ArtworkUploadData): Promise<Artwork> => {
     if (!user) throw new Error('No user logged in')
@@ -386,6 +385,20 @@ export const useArtworks = () => {
 
         if (storageError) {
           console.error('Error deleting file from storage:', storageError)
+        }
+      }
+
+      // Delete cover image if it exists
+      if (artwork.cover_image_url) {
+        try {
+          const coverUrl = new URL(artwork.cover_image_url)
+          const coverPathParts = coverUrl.pathname.split('/artworks/')
+          const coverPath = coverPathParts[1]
+          if (coverPath) {
+            await supabase.storage.from('artworks').remove([coverPath])
+          }
+        } catch (err) {
+          console.error('Error parsing cover image URL for deletion:', err)
         }
       }
 

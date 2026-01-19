@@ -14,6 +14,21 @@ export const PWAInstallPrompt = () => {
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault()
+      
+      // Check if user dismissed recently (30 days) or already installed
+      const dismissed = localStorage.getItem('pwa-install-dismissed')
+      const installed = localStorage.getItem('pwa-installed')
+      
+      if (installed === 'true') return
+
+      if (dismissed) {
+        const dismissedTime = parseInt(dismissed)
+        const thirtyDays = 30 * 24 * 60 * 60 * 1000
+        if (Date.now() - dismissedTime < thirtyDays) {
+          return
+        }
+      }
+
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       setShowPrompt(true)
     }
@@ -34,26 +49,16 @@ export const PWAInstallPrompt = () => {
     if (outcome === 'accepted') {
       setDeferredPrompt(null)
       setShowPrompt(false)
+      // Also remember acceptance to not show again
+      localStorage.setItem('pwa-installed', 'true')
     }
   }
 
   const handleDismiss = () => {
     setShowPrompt(false)
-    // Remember dismissal for 7 days
+    // Remember dismissal for 30 days
     localStorage.setItem('pwa-install-dismissed', Date.now().toString())
   }
-
-  // Check if user dismissed recently
-  useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-install-dismissed')
-    if (dismissed) {
-      const dismissedTime = parseInt(dismissed)
-      const sevenDays = 7 * 24 * 60 * 60 * 1000
-      if (Date.now() - dismissedTime < sevenDays) {
-        setShowPrompt(false)
-      }
-    }
-  }, [])
 
   if (!showPrompt || !deferredPrompt) return null
 

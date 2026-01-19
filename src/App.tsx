@@ -80,7 +80,7 @@ function App() {
       </Routes>
       <Footer />
       <MobileBottomNav />
-      <CTAPopup />
+      {/* <CTAPopup /> */}
       <PWAInstallPrompt />
       
       {/* Profile Completion Modal */}

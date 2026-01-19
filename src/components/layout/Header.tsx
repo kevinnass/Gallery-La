@@ -91,7 +91,7 @@ export const Header = () => {
           ) : (
             <Link 
               to="/auth"
-              className="px-4 py-2 text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-lg transition-opacity hover:opacity-80"
+              className="px-4 py-2 text-sm font-medium text-white bg-foreground dark:bg-white dark:text-foreground rounded-md transition-opacity hover:opacity-80"
             >
               connexion
             </Link>

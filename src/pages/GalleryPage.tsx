@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ArrowLeft, Grid, Layout, Maximize2, Loader2, Camera, Music, Play, LayoutGrid, SlidersHorizontal, Search } from 'lucide-react'
+import { Plus, ArrowLeft, Grid, Layout, Maximize2, Loader2, Camera, Music, Play, SlidersHorizontal, Search } from 'lucide-react'
 import { useArtworks, type Artwork } from '@/hooks/useArtworks'
 import { useProfile } from '@/hooks/useProfile'
 import { useAuth } from '@/hooks/useAuth'
@@ -491,8 +491,13 @@ export const GalleryPage = () => {
         artwork={selectedArtwork}
         isOpen={!!selectedArtwork && !selectedArtwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)}
         onClose={() => setSelectedArtwork(null)}
-        onUpdate={isOwner ? updateArtwork : async () => {}}
-        onDelete={isOwner ? deleteArtwork : async () => {}}
+        onUpdate={isOwner && selectedArtwork ? async (id: string, fields: Partial<Artwork>) => {
+          await updateArtwork(id, fields)
+        } : undefined}
+        onDelete={isOwner && selectedArtwork ? async (id: string) => {
+          await deleteArtwork(id)
+          setSelectedArtwork(null)
+        } : undefined}
         isOwner={isOwner}
       />
 

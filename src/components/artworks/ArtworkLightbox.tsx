@@ -8,8 +8,8 @@ interface ArtworkLightboxProps {
   artwork: Artwork | null
   isOpen: boolean
   onClose: () => void
-  onUpdate: (id: string, data: Partial<Pick<Artwork, 'title' | 'description' | 'is_public'>>) => Promise<Artwork | void>
-  onDelete: (id: string) => Promise<void>
+  onUpdate?: (id: string, data: Partial<Pick<Artwork, 'title' | 'description' | 'is_public'>>) => Promise<Artwork | void>
+  onDelete?: (id: string) => Promise<void>
   isOwner?: boolean
   artistName?: string
   onArtistClick?: (username: string) => void
@@ -38,11 +38,12 @@ export const ArtworkLightbox = ({
       setLocalArtwork(artwork)
       setTitle(artwork.title || '')
       setDescription(artwork.description || '')
+      setIsLoading(false) // Reset loading state when new artwork opens
     }
   }, [artwork])
 
   const handleSaveTitle = async () => {
-    if (!localArtwork) return
+    if (!localArtwork || !onUpdate) return
     try {
       setIsLoading(true)
       const updated = await onUpdate(localArtwork.id, { title: title.trim() || undefined })
@@ -58,7 +59,7 @@ export const ArtworkLightbox = ({
   }
 
   const handleSaveDescription = async () => {
-    if (!localArtwork) return
+    if (!localArtwork || !onUpdate) return
     try {
       setIsLoading(true)
       const updated = await onUpdate(localArtwork.id, { description: description.trim() || undefined })
@@ -74,7 +75,7 @@ export const ArtworkLightbox = ({
   }
 
   const handleTogglePublic = async () => {
-    if (!localArtwork) return
+    if (!localArtwork || !onUpdate) return
     try {
       setIsLoading(true)
       const updated = await onUpdate(localArtwork.id, { is_public: !localArtwork.is_public })
@@ -89,22 +90,21 @@ export const ArtworkLightbox = ({
   }
 
   const handleDelete = async () => {
-    if (!localArtwork) return
+    if (!localArtwork || !onDelete) return
     try {
       setIsLoading(true)
       await onDelete(localArtwork.id)
       onClose()
     } catch (err) {
       console.error('Error deleting artwork:', err)
+    } finally {
       setIsLoading(false)
     }
   }
 
-  if (!localArtwork) return null
-
   return (
-    <AnimatePresence>
-      {isOpen && (
+    <AnimatePresence mode="wait">
+      {isOpen && localArtwork && (
         <>
           {/* Backdrop */}
           <motion.div
@@ -241,7 +241,7 @@ export const ArtworkLightbox = ({
                     <span className="text-[9px] uppercase tracking-[0.4em] text-neutral-400">Accès</span>
                     <div className="flex items-center gap-2">
                       <div className={`w-1.5 h-1.5 rounded-full ${localArtwork.is_public ? 'bg-emerald-500' : 'bg-neutral-300'}`} />
-                      <p className="text-sm font-medium uppercase tracking-widest text-neutral-600 dark:text-neutral-400">
+                      <p className="text-sm font-medium uppercase tracking-widest text-neutral-800 dark:text-neutral-400">
                         {localArtwork.is_public ? 'Publique' : 'Privée'}
                       </p>
                     </div>
@@ -252,7 +252,7 @@ export const ArtworkLightbox = ({
                       <button 
                         onClick={handleTogglePublic}
                         disabled={isLoading}
-                        className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                        className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-neutral-800 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50"
                       >
                         {localArtwork.is_public ? 'Rendre privé' : 'Rendre public'}
                         <div className="w-8 h-px bg-neutral-100 dark:bg-neutral-800 group-hover:w-12 transition-all" />
@@ -261,7 +261,7 @@ export const ArtworkLightbox = ({
                       <button 
                         onClick={() => setShowDeleteConfirm(true)}
                         disabled={isLoading}
-                        className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                        className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
                       >
                         Supprimer
                         <Trash2 size={12} className="opacity-40" />

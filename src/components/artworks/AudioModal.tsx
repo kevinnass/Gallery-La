@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trash2, Pencil } from 'lucide-react'
 import type { Artwork } from '@/hooks/useArtworks'
@@ -41,10 +42,11 @@ export const AudioModal = ({
       setLocalArtwork(artwork)
       setEditedTitle(artwork.title || '')
       setEditedDesc(artwork.description || '')
+      setIsUpdating(false)
+      setIsDeleting(false)
     }
   }, [artwork])
 
-  if (!isOpen || !localArtwork) return null
 
   const handleSaveTitle = async () => {
     if (!onUpdate) return
@@ -104,8 +106,8 @@ export const AudioModal = ({
 
   return (
     <>
-      <AnimatePresence>
-        {isOpen && (
+      <AnimatePresence mode="wait">
+        {isOpen && localArtwork && (
           <>
             {/* Backdrop */}
             <motion.div
@@ -299,7 +301,7 @@ export const AudioModal = ({
                            <button 
                             onClick={handleTogglePublic}
                             disabled={isUpdating}
-                            className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                            className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-neutral-800 hover:text-neutral-900 dark:hover:text-white transition-colors disabled:opacity-50"
                           >
                              {localArtwork.is_public ? 'Rendre privé' : 'Rendre public'}
                              <div className="w-8 h-px bg-neutral-100 dark:bg-neutral-800 group-hover:w-12 transition-all" />
@@ -308,7 +310,7 @@ export const AudioModal = ({
                           <button 
                             onClick={() => setShowConfirmDelete(true)}
                             disabled={isUpdating || isDeleting}
-                            className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                            className="w-full group flex items-center hover:underline justify-between text-[10px] uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
                           >
                              Supprimer
                              <Trash2 size={12} className="opacity-40" />

@@ -32,12 +32,12 @@ export const Footer = () => {
       {/* Desktop Footer */}
       <footer className="hidden md:block w-full bg-background dark:bg-neutral-950 py-8 transition-colors">
         <div className="container flex justify-between mx-auto max-w-7xl px-8">
-          <p className="text-center text-sm text-black dark:text-white">
-            © {currentYear} - Tous les droits appartiennent aux créateurs
+          <p className="text-center text-sm text-neutral-500 dark:text-white">
+            © {currentYear} - Gallery-La - Tous les droits appartiennent aux créateurs
           </p>
           
           <div className="relative">
-            <p className="text-center text-sm text-black dark:text-white">
+            <p className="text-center text-sm text-neutral-500 dark:text-white">
               Développé par{' '}
               <button
                 onClick={() => setShowSocials(!showSocials)}
@@ -87,11 +87,11 @@ export const Footer = () => {
       <footer className="md:hidden w-full bg-background dark:bg-neutral-950 py-5 mb-16 border-t border-neutral-200 dark:border-neutral-800 transition-colors">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center space-y-2">
-            <p className="text-xs text-neutral-600 dark:text-neutral-400">
-               © {currentYear} - Tous les droits appartiennent aux créateurs
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+               © {currentYear} - Gallery-La - Tous les droits appartiennent aux créateurs
             </p>
             <div className="relative">
-              <p className="text-center text-xs text-black dark:text-white">
+              <p className="text-center text-xs text-neutral-500 dark:text-white">
                 Développé par{' '}
                 <button
                   onClick={() => setShowSocials(!showSocials)}
