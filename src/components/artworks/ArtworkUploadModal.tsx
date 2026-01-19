@@ -211,6 +211,7 @@ export const ArtworkUploadModal = ({ isOpen, onClose, onSuccess }: ArtworkUpload
                         src={preview}
                         controls
                         controlsList="nodownload"
+                        onContextMenu={(e) => e.preventDefault()}
                         className="w-full h-64 rounded-xl bg-black"
                       />
                     ) : file?.type.startsWith('audio/') && preview ? (
@@ -271,7 +272,7 @@ export const ArtworkUploadModal = ({ isOpen, onClose, onSuccess }: ArtworkUpload
                         
                         {/* Audio Player */}
                         <div className="w-full p-6 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl">
-                          <audio src={preview} controls controlsList="nodownload" className="w-full" />
+                          <audio src={preview} controls controlsList="nodownload" onContextMenu={(e) => e.preventDefault()} className="w-full" />
                         </div>
                       </div>
                     ) : null}

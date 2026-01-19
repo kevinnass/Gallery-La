@@ -5,6 +5,7 @@ import { useArtworks, type ArtworkWithProfile } from '@/hooks/useArtworks'
 import { GalleryArtworkCard } from '@/components/artworks/GalleryArtworkCard'
 import { ArtworkLightbox } from '@/components/artworks/ArtworkLightbox'
 import { AudioModal } from '@/components/artworks/AudioModal'
+import { ScrollToTop } from '@/components/ui/ScrollToTop'
 
 const container = {
   hidden: { opacity: 0 },
@@ -56,7 +57,7 @@ export const PublicGalleryPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-400 dark:text-neutral-500 font-medium mb-4 block">
+            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-600 dark:text-neutral-500 font-medium mb-4 block">
               Exposition
             </span>
             <h1 className="text-5xl md:text-7xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight mb-6">
@@ -132,6 +133,7 @@ export const PublicGalleryPage = () => {
           onArtistClick={handleArtistClick}
         />
       )}
+      <ScrollToTop />
     </div>
   )
 }

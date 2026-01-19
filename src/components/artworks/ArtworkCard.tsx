@@ -33,6 +33,8 @@ export const ArtworkCard = ({ artwork, onClick, isOwner = true, artistName, onAr
                 src={artwork.image_url}
                 className="w-full h-full object-cover"
                 controls
+                controlsList="nodownload"
+                onContextMenu={(e) => e.preventDefault()}
                 preload="metadata"
               />
               <div className="absolute top-2 left-2 px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center gap-1.5">
@@ -78,6 +80,7 @@ export const ArtworkCard = ({ artwork, onClick, isOwner = true, artistName, onAr
                   src={artwork.image_url}
                   controls
                   controlsList="nodownload"
+                  onContextMenu={(e) => e.preventDefault()}
                   className="w-full"
                   preload="metadata"
                 />

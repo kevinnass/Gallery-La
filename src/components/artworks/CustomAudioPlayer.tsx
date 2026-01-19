@@ -83,7 +83,12 @@ export const CustomAudioPlayer = ({ src, title }: CustomAudioPlayerProps) => {
 
   return (
     <div className="relative w-full max-w-lg">
-      <audio ref={audioRef} src={src} />
+      <audio 
+        ref={audioRef} 
+        src={src} 
+        controlsList="nodownload"
+        onContextMenu={(e) => e.preventDefault()}
+      />
       
       {/* Main Player Card */}
       <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl shadow-2xl overflow-hidden">

@@ -8,18 +8,18 @@ export const HomePage = () => {
   const sections = [
     {
       title: "Pureté",
-      text: "Chaque pixel est une intention. Chaque œuvre est une émotion.",
-      metadata: ["ID: 001", "MEDIUM: DIGITAL", "PERMANENT COLLECTION"]
+      text: "Chaque œuvre est une émotion.",
+      metadata: ''
     },
     {
       title: "Expérience",
       text: "Une interface pensée pour laisser place à la contemplation.",
-      metadata: ["ID: 002", "TYPE: IMMERSIVE", "CURATED VIEW"]
+      metadata: ''
     },
     {
       title: "Liberté",
-      text: "Votre espace, vos règles, votre vision du monde.",
-      metadata: ["ID: 003", "ORIGIN: ARTIST OWNED", "DECENTRALIZED"]
+      text: "Vos œuvres, votre vision du monde.",
+      metadata: ''
     }
   ]
 
@@ -49,55 +49,11 @@ export const HomePage = () => {
                 <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 max-w-md font-light leading-relaxed mb-8">
                   {section.text}
                 </p>
-                
-                {/* Museum Label */}
-                <div className={`flex gap-4 opacity-30 ${index % 2 === 1 ? 'flex-row-reverse' : ''}`}>
-                  {section.metadata.map((meta, i) => (
-                    <span key={i} className="text-[9px] uppercase tracking-[0.2em] font-medium text-neutral-500 dark:text-neutral-400">
-                      {meta}
-                    </span>
-                  ))}
-                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
-
-      {/* Curated Collection Section - MIMICKING A PHYSICAL GALLERY WALL */}
-      {/* <section className="py-40 px-4 relative z-10">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="border-t border-neutral-200 dark:border-neutral-800 pt-8 mb-20"
-          >
-            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-400 font-medium">
-              Séléction Commissaire / Exhibition 2026.01
-            </span>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800 border-[0.5px] border-neutral-200 dark:border-neutral-800">
-            {[1, 2, 3].map((item) => (
-              <motion.div
-                key={item}
-                whileHover={{ backgroundColor: "rgba(147, 51, 234, 0.05)" }}
-                className="bg-background dark:bg-neutral-950 p-12 aspect-[4/5] flex flex-col items-center justify-center relative cursor-crosshair group transition-colors duration-700"
-              >
-                <div className="w-full h-full border-[0.5px] border-neutral-100 dark:border-neutral-900 group-hover:border-purple-500/30 transition-colors duration-700 flex items-center justify-center p-8">
-                  <div className="w-12 h-12 border border-neutral-300 dark:border-neutral-700 rounded-full flex items-center justify-center opacity-20 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[8px] uppercase tracking-tighter">+</span>
-                  </div>
-                </div>
-                <div className="absolute bottom-6 left-6 text-left">
-                  <p className="text-[9px] uppercase tracking-[0.3em] font-medium text-neutral-400">Item_{item.toString().padStart(3, '0')}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       {/* Subtle CTA Section */}
       <section className="py-40 px-4 relative z-10">
@@ -137,11 +93,6 @@ export const HomePage = () => {
       </section>
       
       {/* Final minimalist signature */}
-      <div className="py-20 text-center opacity-20 hover:opacity-100 transition-opacity duration-1000">
-        <span className="text-[10px] uppercase tracking-[1em] text-neutral-500">
-          Gallery-La — 2026
-        </span>
-      </div>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { Footer } from './components/layout/Footer'
 import { MobileBottomNav } from './components/layout/MobileBottomNav'
 import { CTAPopup } from './components/ui/CTAPopup'
 import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt'
+import { ScrollToTopOnNavigation } from './components/ui/ScrollToTopOnNavigation'
 import { ProfileCompletionModal } from './components/profile/ProfileCompletionModal'
 import { HomePage } from './pages/HomePage'
 import { AuthPage } from './pages/AuthPage'
@@ -65,6 +66,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTopOnNavigation />
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />

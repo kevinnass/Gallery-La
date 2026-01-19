@@ -19,7 +19,7 @@ export const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-          className="text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] font-display font-medium tracking-[-0.04em] leading-[0.9] text-foreground dark:text-white"
+          className="text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] font-display font-light tracking-[-0.04em] leading-[0.9] text-foreground dark:text-white"
         >
           Gallery-la
         </motion.h1>

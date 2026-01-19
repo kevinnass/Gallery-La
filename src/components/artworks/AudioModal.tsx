@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trash2, MoreVertical } from 'lucide-react'
+import { X, Trash2, Pencil } from 'lucide-react'
 import type { Artwork } from '@/hooks/useArtworks'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
@@ -190,6 +190,8 @@ export const AudioModal = ({
                        <audio 
                         src={localArtwork.image_url} 
                         controls 
+                        controlsList="nodownload"
+                        onContextMenu={(e) => e.preventDefault()}
                         className="w-full opacity-60 hover:opacity-100 transition-opacity"
                       />
                       <div className="flex justify-between items-center px-1">
@@ -206,7 +208,7 @@ export const AudioModal = ({
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="flex-[3] bg-white dark:bg-neutral-950 border-l-[0.5px] border-neutral-100 dark:border-neutral-900 z-10 flex flex-col pt-32 p-12 overflow-y-auto"
+                className="flex-[3] bg-white dark:bg-neutral-950 border-l-[0.5px] border-black dark:border-white z-10 flex flex-col pt-32 p-12 overflow-y-auto"
               >
                  <div className="space-y-12">
                    {/* Header Stats */}
@@ -224,12 +226,19 @@ export const AudioModal = ({
                           disabled={isUpdating}
                         />
                       ) : (
-                        <h2 
-                          onClick={() => isOwner && setIsEditingTitle(true)}
-                          className={`text-4xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
-                        >
-                          {localArtwork.title || 'Boucle_Sans_Titre'}
-                        </h2>
+                        <div className="relative group/title">
+                          <h2 
+                            onClick={() => isOwner && setIsEditingTitle(true)}
+                            className={`text-4xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
+                          >
+                            {localArtwork.title || 'Boucle_Sans_Titre'}
+                          </h2>
+                          {isOwner && (
+                            <div className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover/title:opacity-40 transition-opacity">
+                              <Pencil size={16} className="text-neutral-400" />
+                            </div>
+                          )}
+                        </div>
                       )}
 
                       <div className="w-12 h-[1px] bg-purple-600/30" />
@@ -244,12 +253,19 @@ export const AudioModal = ({
                           disabled={isUpdating}
                         />
                       ) : (
-                        <p 
-                          onClick={() => isOwner && setIsEditingDesc(true)}
-                          className={`text-neutral-500 dark:text-neutral-400 font-light text-lg leading-relaxed whitespace-pre-wrap ${isOwner ? 'hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 cursor-text p-2 -m-2 transition-colors' : ''}`}
-                        >
-                          {localArtwork.description || (isOwner ? "Ajouter une description audio..." : "")}
-                        </p>
+                        <div className="relative group/desc">
+                          <p 
+                            onClick={() => isOwner && setIsEditingDesc(true)}
+                            className={`text-neutral-500 dark:text-neutral-400 font-light text-lg leading-relaxed whitespace-pre-wrap ${isOwner ? 'hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 cursor-text p-2 -m-2 transition-colors' : ''}`}
+                          >
+                            {localArtwork.description || (isOwner ? "Ajouter une description audio..." : "")}
+                          </p>
+                          {isOwner && (
+                            <div className="absolute -left-8 top-4 opacity-0 group-hover/desc:opacity-40 transition-opacity">
+                              <Pencil size={14} className="text-neutral-400" />
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
 
@@ -301,11 +317,6 @@ export const AudioModal = ({
                       )}
                     </div>
                  </div>
-
-                 <div className="mt-auto pt-20 flex justify-between items-center text-neutral-300 dark:text-neutral-700">
-                    <span className="text-[9px] uppercase tracking-[0.5em]">Registre_Audio / La</span>
-                    <span className="text-[9px] tracking-tighter">V.01-26</span>
-                  </div>
               </motion.div>
             </div>
           </>

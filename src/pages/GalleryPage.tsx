@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ArrowLeft } from 'lucide-react'
+import { Plus, ArrowLeft, Grid, Layout, Maximize2, Loader2 } from 'lucide-react'
 import { useArtworks, type Artwork } from '@/hooks/useArtworks'
 import { useProfile } from '@/hooks/useProfile'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,6 +9,9 @@ import { ArtworkUploadModal } from '@/components/artworks/ArtworkUploadModal'
 import { GalleryArtworkCard } from '@/components/artworks/GalleryArtworkCard'
 import { ArtworkLightbox } from '@/components/artworks/ArtworkLightbox'
 import { AudioModal } from '@/components/artworks/AudioModal'
+import { MasonryLayout } from '@/components/artworks/layouts/MasonryLayout'
+import { EditorialLayout } from '@/components/artworks/layouts/EditorialLayout'
+import { ScrollToTop } from '@/components/ui/ScrollToTop'
 
 const container = {
   hidden: { opacity: 0 },
@@ -38,9 +41,11 @@ export const GalleryPage = () => {
   const { user } = useAuth()
   const { getProfileByUsername } = useProfile()
   const { artworks, loading, fetchPublicArtworks, fetchArtworksByUserId, updateArtwork, updateCoverImage, deleteArtwork, refetch } = useArtworks()
+  const { createOrUpdateProfile } = useProfile()
   
   const [galleryProfile, setGalleryProfile] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(true)
+  const [isUpdatingLayout, setIsUpdatingLayout] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
   const [showAudioModal, setShowAudioModal] = useState(false)
@@ -92,6 +97,24 @@ export const GalleryPage = () => {
     return true
   })
 
+  const handleUpdateLayout = async (layout: 'grid' | 'masonry' | 'editorial') => {
+    if (!isOwner || !galleryProfile) return
+    
+    try {
+      setIsUpdatingLayout(true)
+      await createOrUpdateProfile({
+        username: galleryProfile.username,
+        specialty: galleryProfile.specialty,
+        gallery_layout: layout
+      })
+      setGalleryProfile((prev: any) => ({ ...prev, gallery_layout: layout }))
+    } catch (err) {
+      console.error('Error updating layout:', err)
+    } finally {
+      setIsUpdatingLayout(false)
+    }
+  }
+
   if (profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background dark:bg-neutral-950">
@@ -125,7 +148,7 @@ export const GalleryPage = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-400 dark:text-neutral-500 font-medium mb-4 block">
+              <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-600 dark:text-neutral-500 font-medium mb-4 block">
                 {isOwner ? 'Votre Espace' : 'Exposition Individuelle'}
               </span>
               <h1 className="text-5xl md:text-7xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight mb-4">
@@ -180,6 +203,45 @@ export const GalleryPage = () => {
           </div>
         )}
 
+        {/* Layout Switcher (Owner only) */}
+        {isOwner && artworks.length > 0 && (
+          <div className="flex items-center justify-end gap-6 mb-8">
+            <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400">Scénographie</span>
+            <div className="flex items-center gap-1 border-[0.5px] border-neutral-100 dark:border-neutral-900 p-1 rounded-sm bg-neutral-50/30 dark:bg-neutral-900/10">
+              {[
+                { id: 'grid', icon: Grid, label: 'Musée' },
+                { id: 'masonry', icon: Layout, label: 'Masonry' },
+                { id: 'editorial', icon: Maximize2, label: 'Éditorial' }
+              ].map((l) => (
+                <button
+                  key={l.id}
+                  onClick={() => handleUpdateLayout(l.id as any)}
+                  disabled={isUpdatingLayout}
+                  className={`p-2 transition-all duration-300 relative group/layout ${
+                    galleryProfile?.gallery_layout === l.id
+                      ? 'text-purple-600'
+                      : 'text-neutral-300 hover:text-neutral-600 dark:hover:text-neutral-200'
+                  }`}
+                  title={l.label}
+                >
+                  <l.icon size={14} />
+                  {galleryProfile?.gallery_layout === l.id && (
+                    <motion.div 
+                      layoutId="activeLayoutTab"
+                      className="absolute inset-0 border border-purple-500/20 bg-purple-500/5 rounded-sm"
+                    />
+                  )}
+                  {isUpdatingLayout && galleryProfile?.gallery_layout === l.id && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-neutral-950/50">
+                      <Loader2 size={10} className="animate-spin" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Gallery Content Area with Stable Transitions */}
         <div className="relative min-h-[400px]">
           <AnimatePresence mode="wait" initial={false}>
@@ -209,36 +271,60 @@ export const GalleryPage = () => {
                   Aucun objet repertorié
                 </p>
               </motion.div>
-            ) : (
-              <motion.div
-                key={`grid-${filter}`}
-                variants={container}
-                initial="hidden"
-                animate="show"
-                exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
-              >
-                {filteredArtworks.map((artwork) => (
-                  <motion.div
-                    key={artwork.id}
-                    variants={item}
-                    layout // Add layout prop for smoother reordering if needed
-                    className="w-full"
-                  >
-                    <GalleryArtworkCard
-                      artwork={artwork}
-                      onClick={() => {
-                        setSelectedArtwork(artwork)
-                        if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
-                          setShowAudioModal(true)
-                        }
-                      }}
-                      isOwner={isOwner}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
+            ) : galleryProfile?.gallery_layout === 'masonry' ? (
+                <MasonryLayout
+                  key="masonry"
+                  artworks={filteredArtworks}
+                  onArtworkClick={(artwork) => {
+                    setSelectedArtwork(artwork)
+                    if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
+                      setShowAudioModal(true)
+                    }
+                  }}
+                  isOwner={isOwner}
+                />
+              ) : galleryProfile?.gallery_layout === 'editorial' ? (
+                <EditorialLayout
+                  key="editorial"
+                  artworks={filteredArtworks}
+                  onArtworkClick={(artwork) => {
+                    setSelectedArtwork(artwork)
+                    if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
+                      setShowAudioModal(true)
+                    }
+                  }}
+                  isOwner={isOwner}
+                />
+              ) : (
+                <motion.div
+                  key={`grid-${filter}`}
+                  variants={container}
+                  initial="hidden"
+                  animate="show"
+                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
+                >
+                  {filteredArtworks.map((artwork) => (
+                    <motion.div
+                      key={artwork.id}
+                      variants={item}
+                      layout // Add layout prop for smoother reordering if needed
+                      className="w-full"
+                    >
+                      <GalleryArtworkCard
+                        artwork={artwork}
+                        onClick={() => {
+                          setSelectedArtwork(artwork)
+                          if (artwork.image_url.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
+                            setShowAudioModal(true)
+                          }
+                        }}
+                        isOwner={isOwner}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
           </AnimatePresence>
         </div>
       </div>
@@ -283,6 +369,8 @@ export const GalleryPage = () => {
         onDelete={isOwner ? deleteArtwork : async () => {}}
         isOwner={isOwner}
       />
+
+      <ScrollToTop />
     </div>
   )
 }

@@ -9,6 +9,7 @@ export interface Profile {
   specialty: string | null
   instagram_handle: string | null
   location: string | null
+  gallery_layout?: 'grid' | 'masonry' | 'editorial' | null
   created_at?: string
   updated_at?: string
 }
@@ -121,6 +122,7 @@ export const useProfile = () => {
     specialty: string
     instagram_handle?: string
     location?: string
+    gallery_layout?: 'grid' | 'masonry' | 'editorial'
   }) => {
     if (!user) throw new Error('No user logged in')
 
@@ -135,6 +137,7 @@ export const useProfile = () => {
         specialty: data.specialty,
         instagram_handle: data.instagram_handle?.trim() || null,
         location: data.location?.trim() || null,
+        gallery_layout: data.gallery_layout || profile?.gallery_layout || 'grid',
         updated_at: new Date().toISOString(),
       }
 

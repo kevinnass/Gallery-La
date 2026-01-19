@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useProfile, type ProfileWithStats } from '@/hooks/useProfile'
+import { ScrollToTop } from '@/components/ui/ScrollToTop'
 
 const container = {
   hidden: { opacity: 0 },
@@ -44,7 +45,7 @@ export const ArtistsPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-400 dark:text-neutral-500 font-medium mb-4 block">
+            <span className="text-[10px] uppercase tracking-[0.5em] text-neutral-600 dark:text-neutral-500 font-medium mb-4 block">
               Communauté
             </span>
             <h1 className="text-5xl md:text-7xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight mb-6">
@@ -52,7 +53,7 @@ export const ArtistsPage = () => {
             </h1>
             <div className="w-12 h-[1px] bg-purple-600/30 mb-8" />
             <p className="text-neutral-500 dark:text-neutral-400 font-light text-xl max-w-2xl leading-relaxed">
-              Découvrez les créateurs qui façonnent l'esthétique de Gallery-La.
+              Découvrez les créateurs et leurs œuvres.
             </p>
           </motion.div>
         </div>
@@ -158,6 +159,7 @@ export const ArtistsPage = () => {
           </motion.div>
         )}
       </div>
+      <ScrollToTop />
     </div>
   )
 }

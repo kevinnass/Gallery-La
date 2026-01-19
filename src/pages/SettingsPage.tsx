@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Check, AlertCircle, Loader2, ArrowLeft } from 'lucide-react'
+import { Check, AlertCircle, Loader2, ArrowLeft, Grid, Layout, Maximize2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useProfile } from '@/hooks/useProfile'
 import { Button } from '@/components/ui/Button'
@@ -25,6 +25,7 @@ export const SettingsPage = () => {
   const [specialty, setSpecialty] = useState('')
   const [instagramHandle, setInstagramHandle] = useState('')
   const [location, setLocation] = useState('')
+  const [galleryLayout, setGalleryLayout] = useState<'grid' | 'masonry' | 'editorial'>('grid')
   
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -39,6 +40,7 @@ export const SettingsPage = () => {
       setSpecialty(profile.specialty || '')
       setInstagramHandle(profile.instagram_handle || '')
       setLocation(profile.location || '')
+      setGalleryLayout((profile as any).gallery_layout || 'grid')
     }
   }, [profile])
 
@@ -93,6 +95,7 @@ export const SettingsPage = () => {
         specialty,
         instagram_handle: instagramHandle || undefined,
         location: location || undefined,
+        gallery_layout: galleryLayout,
       })
 
       setSuccess(true)
@@ -240,6 +243,49 @@ export const SettingsPage = () => {
                 placeholder="Paris, France"
                 maxLength={100}
               />
+            </div>
+
+            {/* Gallery Layout */}
+            <div className="pt-6 border-t border-neutral-100 dark:border-neutral-800">
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-4">
+                Style d'affichage de la galerie
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { id: 'grid', label: 'Grille Musée', icon: Grid, desc: 'Uniforme et classique' },
+                  { id: 'masonry', label: 'Masonry', icon: Layout, desc: 'Dynamique et fluide' },
+                  { id: 'editorial', label: 'Éditorial', icon: Maximize2, desc: 'Aéré et contemplatif' }
+                ].map((layout) => (
+                  <button
+                    key={layout.id}
+                    type="button"
+                    onClick={() => setGalleryLayout(layout.id as any)}
+                    className={`flex flex-col items-center p-4 rounded-xl border-[0.5px] transition-all duration-300 relative overflow-hidden group ${
+                      galleryLayout === layout.id
+                        ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/10'
+                        : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
+                    }`}
+                  >
+                    <layout.icon className={`w-6 h-6 mb-3 transition-colors ${
+                      galleryLayout === layout.id ? 'text-purple-600' : 'text-neutral-400 group-hover:text-neutral-600'
+                    }`} />
+                    <span className={`text-xs font-medium mb-1 ${
+                      galleryLayout === layout.id ? 'text-purple-900 dark:text-purple-100' : 'text-neutral-700 dark:text-neutral-300'
+                    }`}>
+                      {layout.label}
+                    </span>
+                    <span className="text-[10px] text-neutral-400 text-center">
+                      {layout.desc}
+                    </span>
+                    {galleryLayout === layout.id && (
+                      <motion.div
+                        layoutId="activeLayout"
+                        className="absolute inset-0 border-2 border-purple-500 rounded-xl pointer-events-none"
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Error Message */}
