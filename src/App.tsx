@@ -12,7 +12,6 @@ import { PublicGalleryPage } from './pages/PublicGalleryPage'
 import { ArtistsPage } from './pages/ArtistsPage'
 import { GalleryPage } from './pages/GalleryPage'
 import { ExhibitionDetailPage } from './pages/ExhibitionDetailPage'
-import { ExhibitionsPage } from './pages/ExhibitionsPage'
 import { MyGalleryRedirect } from './pages/MyGalleryRedirect'
 import { SettingsPage } from './pages/SettingsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -73,7 +72,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/gallery" element={<PublicGalleryPage />} />
-        <Route path="/exhibitions" element={<ExhibitionsPage />} />
         <Route path="/artists" element={<ArtistsPage />} />
         <Route path="/artists/:username" element={<GalleryPage />} />
         <Route path="/artists/:username/exhibitions/:exhibitionId" element={<ExhibitionDetailPage />} />

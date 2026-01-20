@@ -115,36 +115,38 @@ export const AudioModal = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
-              className="fixed inset-0 bg-white/95 dark:bg-neutral-950/95 z-[60] backdrop-blur-xl transition-colors"
+              className="fixed inset-0 bg-neutral-950/98 z-[100] backdrop-blur-2xl transition-colors"
             />
 
             {/* Layout Wrapper */}
-            <div className="fixed inset-0 z-[70] flex flex-col md:flex-row h-screen">
+            <div className="fixed inset-0 z-[100] flex flex-col md:flex-row h-full overflow-hidden">
               
               {/* Close Button */}
               <motion.button
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
                 onClick={onClose}
-                className="absolute top-8 right-8 z-[80] p-4 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                className="absolute top-6 right-6 z-[110] p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-white transition-all active:scale-95"
                 disabled={isUpdating || isDeleting}
               >
-                <X size={24} />
+                <X size={20} />
               </motion.button>
 
-              {/* Left Side: Audio Player Card (70%) */}
-              <div className="flex-[7] relative flex items-center justify-center p-8 md:p-12 lg:p-24" onClick={onClose}>
+              {/* Main Content Area - Scrollable for the whole thing on mobile */}
+              <div className="flex-1 flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden">
+                {/* Left/Top Side: Audio Player Card */}
+                <div className="flex-[7] min-h-[60vh] md:min-h-0 relative flex items-center justify-center p-6 md:p-12 lg:p-24" onClick={onClose}>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
                   transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-                  className="relative z-10 w-full max-w-2xl bg-white dark:bg-neutral-950 p-8 md:p-12 shadow-[0_0_100px_rgba(0,0,0,0.05)] dark:shadow-[0_0_100px_rgba(0,0,0,0.2)]"
+                  className="relative z-10 w-full max-w-2xl bg-white dark:bg-neutral-950 p-6 md:p-12 shadow-[0_40px_100px_rgba(0,0,0,0.2)] dark:shadow-[0_0_100px_rgba(0,0,0,0.5)] rounded-2xl md:rounded-none"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="absolute inset-2 border-[0.5px] border-neutral-100 dark:border-neutral-900 pointer-events-none" />
 
-                  <div className="space-y-12">
+                  <div className="space-y-8 md:space-y-12">
                      {/* Cover Image Area */}
                     <div className="relative group mx-auto w-full aspect-square max-w-[400px] border-[0.5px] border-neutral-100 dark:border-neutral-900 p-4">
                        <div className="absolute inset-2 border-[0.5px] border-neutral-50 dark:border-neutral-900 pointer-events-none" />
@@ -207,10 +209,10 @@ export const AudioModal = ({
 
               {/* Right Side: Metadata (30%) */}
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="flex-[3] bg-white dark:bg-neutral-950 border-l-[0.5px] border-black dark:border-white z-10 flex flex-col pt-32 p-12 overflow-y-auto"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 40 }}
+                className="flex-[3] bg-white dark:bg-neutral-950 border-t-[0.5px] md:border-t-0 md:border-l-[0.5px] border-black/10 dark:border-white/10 z-10 flex flex-col pt-8 md:pt-32 p-6 md:p-12 md:overflow-y-auto rounded-t-[32px] md:rounded-none shadow-[0_-20px_40px_rgba(0,0,0,0.1)] dark:shadow-none"
               >
                  <div className="space-y-12">
                    {/* Header Stats */}
@@ -231,7 +233,7 @@ export const AudioModal = ({
                         <div className="relative group/title">
                           <h2 
                             onClick={() => isOwner && setIsEditingTitle(true)}
-                            className={`text-4xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
+                            className={`text-3xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
                           >
                             {localArtwork.title || 'Boucle_Sans_Titre'}
                           </h2>
@@ -319,7 +321,8 @@ export const AudioModal = ({
                       )}
                     </div>
                  </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
           </>
         )}

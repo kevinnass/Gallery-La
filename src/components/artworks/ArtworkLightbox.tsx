@@ -111,23 +111,25 @@ export const ArtworkLightbox = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white/95 dark:bg-neutral-950/95 z-50 transition-colors backdrop-blur-xl"
+            className="fixed inset-0 bg-neutral-950/98 z-[100] backdrop-blur-2xl transition-colors"
             onClick={onClose}
           />
 
-          <div className="fixed inset-0 z-50 flex flex-col md:flex-row h-screen">
+          <div className="fixed inset-0 z-[100] flex flex-col md:flex-row h-full overflow-hidden">
             {/* Close Button - Floats Top Right */}
             <motion.button
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={onClose}
-              className="absolute top-8 right-8 z-[60] p-4 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+              className="absolute top-4 right-4 md:top-8 md:right-8 z-[60] p-4 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
             >
               <X size={24} />
             </motion.button>
 
-            {/* Left: Media Area (70%) */}
-            <div className="flex-[7] relative flex items-center justify-center p-8 md:p-12 lg:p-20 overflow-hidden" onClick={onClose}>
+            {/* Main Content Area - Scrollable on mobile */}
+            <div className="flex-1 flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden">
+              {/* Left/Top: Media Area */}
+              <div className="flex-[7] min-h-[50vh] md:min-h-0 relative flex items-center justify-center p-6 md:p-12 lg:p-20" onClick={onClose}>
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -158,13 +160,13 @@ export const ArtworkLightbox = ({
               </motion.div>
             </div>
 
-            {/* Right: Info Area (30%) */}
-            <motion.div 
-               initial={{ opacity: 0, x: 20 }}
-               animate={{ opacity: 1, x: 0 }}
-               exit={{ opacity: 0, x: 20 }}
-               className="flex-[3] bg-white dark:bg-neutral-950 border-l-[0.5px] border-black dark:border-white z-10 flex flex-col pt-32 p-12 overflow-y-auto"
-            >
+              {/* Right/Bottom: Info Area */}
+              <motion.div 
+                 initial={{ opacity: 0, y: 40 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 exit={{ opacity: 0, y: 40 }}
+                 className="flex-[3] bg-white dark:bg-neutral-950 border-t-[0.5px] md:border-t-0 md:border-l-[0.5px] border-black/10 dark:border-white/10 z-10 flex flex-col pt-8 md:pt-32 p-6 md:p-12 md:overflow-y-auto rounded-t-[32px] md:rounded-none shadow-[0_-20px_40px_rgba(0,0,0,0.1)] dark:shadow-none"
+              >
               <div className="space-y-12">
 
                 {/* Title and Description */}
@@ -184,7 +186,7 @@ export const ArtworkLightbox = ({
                     <div className="relative group/title">
                       <h2 
                         onClick={() => isOwner && setEditingField('title')}
-                        className={`text-4xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
+                        className={`text-3xl md:text-5xl lg:text-6xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight transition-colors ${isOwner ? 'hover:text-purple-600 cursor-text' : ''}`}
                       >
                         {localArtwork.title || 'Sans titre'}
                       </h2>
@@ -270,7 +272,8 @@ export const ArtworkLightbox = ({
                   )}
                 </div>
               </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
 
           <ConfirmDialog

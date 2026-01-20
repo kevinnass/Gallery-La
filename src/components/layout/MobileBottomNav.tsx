@@ -11,7 +11,6 @@ export const MobileBottomNav = () => {
   const navItems = [
     { name: 'Accueil', href: '/', icon: Home },
     { name: 'Galerie', href: '/gallery', icon: ImageIcon },
-    { name: 'Expos', href: '/exhibitions', icon: Library },
     { name: 'Artistes', href: '/artists', icon: Users },
   ]
 
