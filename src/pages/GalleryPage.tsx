@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, ArrowLeft, Grid, Layout, Maximize2, Loader2, Camera, Music, Play, SlidersHorizontal, Search } from 'lucide-react'
+import { Plus, ArrowLeft, LayoutGrid, Library, Search, SlidersHorizontal, Camera, Play, Music, Grid, Layout, Maximize2, Loader2 } from 'lucide-react'
 import { useArtworks, type Artwork } from '@/hooks/useArtworks'
 import { useProfile } from '@/hooks/useProfile'
 import { useAuth } from '@/hooks/useAuth'
@@ -12,6 +12,8 @@ import { AudioModal } from '@/components/artworks/AudioModal'
 import { MasonryLayout } from '@/components/artworks/layouts/MasonryLayout'
 import { EditorialLayout } from '@/components/artworks/layouts/EditorialLayout'
 import { ScrollToTop } from '@/components/ui/ScrollToTop'
+import { useExhibitions } from '@/hooks/useExhibitions'
+import { CreateExhibitionModal } from '@/components/exhibitions/CreateExhibitionModal'
 
 const container = {
   hidden: { opacity: 0 },
@@ -52,6 +54,9 @@ export const GalleryPage = () => {
   const [mediaFilter, setMediaFilter] = useState<'all' | 'image' | 'video' | 'audio'>('all')
   const [showFilters, setShowFilters] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [viewMode, setViewMode] = useState<'chronological' | 'exhibitions'>('chronological')
+  const [showCreateExhibitionModal, setShowCreateExhibitionModal] = useState(false)
+  const { exhibitions, loading: exhibitionsLoading, fetchExhibitionsByUserId, fetchPublicExhibitions } = useExhibitions()
 
   const isOwner = user?.id === galleryProfile?.id
 
@@ -85,6 +90,17 @@ export const GalleryPage = () => {
 
     loadGallery()
   }, [username, user, getProfileByUsername, fetchPublicArtworks, fetchArtworksByUserId, navigate])
+
+  // Load exhibitions
+  useEffect(() => {
+    if (viewMode === 'exhibitions' && galleryProfile) {
+      if (user?.id === galleryProfile.id) {
+        fetchExhibitionsByUserId(galleryProfile.id)
+      } else {
+        fetchPublicExhibitions(galleryProfile.id)
+      }
+    }
+  }, [viewMode, galleryProfile, user, fetchExhibitionsByUserId, fetchPublicExhibitions])
 
   const handleUploadSuccess = () => {
     refetch()
@@ -205,9 +221,39 @@ export const GalleryPage = () => {
           </div>
         </div>
 
+        {/* View Switcher */}
+        <div className="flex items-center gap-12 mb-12 border-b border-neutral-100 dark:border-neutral-900 pb-4">
+          {[
+            { id: 'chronological', label: 'Toutes les œuvres', icon: LayoutGrid },
+            { id: 'exhibitions', label: 'Expositions', icon: Library }
+          ].map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => setViewMode(mode.id as any)}
+              className={`flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-medium transition-all duration-500 relative pb-4 ${
+                viewMode === mode.id
+                  ? 'text-purple-600'
+                  : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'
+              }`}
+            >
+              <mode.icon size={14} className={viewMode === mode.id ? 'text-purple-600' : 'text-neutral-400'} />
+              {mode.label}
+              {viewMode === mode.id && (
+                <motion.div
+                  layoutId="activeViewMode"
+                  className="absolute bottom-[-1px] left-0 right-0 h-px bg-purple-600"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
         {/* Search & Visibility */}
-        {artworks.length > 0 && (
-          <div className="mb-12 space-y-8">
+        {viewMode === 'chronological' ? (
+          <>
+            {artworks.length > 0 && (
+            <div className="mb-12 space-y-8">
+              {/* ... existing chronological filter UI ... */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               {/* Search Bar */}
               <motion.div
@@ -325,136 +371,184 @@ export const GalleryPage = () => {
               )}
             </AnimatePresence>
           </div>
-        )}
+            )}
 
-        {/* Layout Switcher (Owner only) */}
-        {isOwner && artworks.length > 0 && (
-          <div className="flex items-center justify-end gap-6 mb-8">
-            <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400">Scénographie</span>
-            <div className="flex items-center gap-1 border-[0.5px] border-neutral-100 dark:border-neutral-900 p-1 rounded-sm bg-neutral-50/30 dark:bg-neutral-900/10">
-              {[
-                { id: 'grid', icon: Grid, label: 'Musée' },
-                { id: 'masonry', icon: Layout, label: 'Masonry' },
-                { id: 'editorial', icon: Maximize2, label: 'Éditorial' }
-              ].map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => handleUpdateLayout(l.id as any)}
-                  disabled={isUpdatingLayout}
-                  className={`p-2 transition-all duration-300 relative group/layout ${
-                    galleryProfile?.gallery_layout === l.id
-                      ? 'text-purple-600'
-                      : 'text-neutral-300 hover:text-neutral-600 dark:hover:text-neutral-200'
-                  }`}
-                  title={l.label}
-                >
-                  <l.icon size={14} />
-                  {galleryProfile?.gallery_layout === l.id && (
+            {/* Layout Switcher (Owner only) */}
+            {isOwner && artworks.length > 0 && (
+              <div className="flex items-center justify-end gap-6 mb-8">
+                <span className="text-[8px] uppercase tracking-[0.4em] text-neutral-400">Scénographie</span>
+                <div className="flex items-center gap-1 border-[0.5px] border-neutral-100 dark:border-neutral-900 p-1 rounded-sm bg-neutral-50/30 dark:bg-neutral-900/10">
+                  {[
+                    { id: 'grid', icon: Grid, label: 'Musée' },
+                    { id: 'masonry', icon: Layout, label: 'Masonry' },
+                    { id: 'editorial', icon: Maximize2, label: 'Éditorial' }
+                  ].map((l) => (
+                    <button
+                      key={l.id}
+                      onClick={() => handleUpdateLayout(l.id as any)}
+                      disabled={isUpdatingLayout}
+                      className={`p-2 transition-all duration-300 relative group/layout ${
+                        galleryProfile?.gallery_layout === l.id
+                          ? 'text-purple-600'
+                          : 'text-neutral-300 hover:text-neutral-600 dark:hover:text-neutral-200'
+                      }`}
+                      title={l.label}
+                    >
+                      <l.icon size={14} />
+                      {galleryProfile?.gallery_layout === l.id && (
+                        <motion.div
+                          layoutId="activeLayoutTab"
+                          className="absolute inset-0 border border-purple-500/20 bg-purple-500/5 rounded-sm"
+                        />
+                      )}
+                      {isUpdatingLayout && galleryProfile?.gallery_layout === l.id && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-neutral-950/50">
+                          <Loader2 size={10} className="animate-spin" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Gallery Content Area with Stable Transitions */}
+            <div className="relative min-h-[400px]">
+              <AnimatePresence mode="wait" initial={false}>
+                {loading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center justify-center py-48"
+                  >
                     <motion.div
-                      layoutId="activeLayoutTab"
-                      className="absolute inset-0 border border-purple-500/20 bg-purple-500/5 rounded-sm"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                      className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full"
                     />
-                  )}
-                  {isUpdatingLayout && galleryProfile?.gallery_layout === l.id && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-neutral-950/50">
-                      <Loader2 size={10} className="animate-spin" />
-                    </div>
-                  )}
+                  </motion.div>
+                ) : filteredArtworks.length === 0 ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-center py-48"
+                  >
+                    <p className="text-neutral-400 dark:text-neutral-500 text-xs font-light uppercase tracking-[0.5em]">
+                      Aucun média correspondant
+                    </p>
+                  </motion.div>
+                ) : galleryProfile?.gallery_layout === 'masonry' ? (
+                  <motion.div
+                    key={`masonry-${filter}-${mediaFilter}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.8 }}
+                  >
+                    <MasonryLayout
+                      artworks={filteredArtworks}
+                      onArtworkClick={setSelectedArtwork}
+                      isOwner={isOwner}
+                    />
+                  </motion.div>
+                ) : galleryProfile?.gallery_layout === 'editorial' ? (
+                  <motion.div
+                    key={`editorial-${filter}-${mediaFilter}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.8 }}
+                  >
+                    <EditorialLayout
+                      artworks={filteredArtworks}
+                      onArtworkClick={setSelectedArtwork}
+                      isOwner={isOwner}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={`grid-${filter}-${mediaFilter}`}
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                    exit="hidden"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
+                  >
+                    <AnimatePresence mode="popLayout">
+                      {filteredArtworks.map((artwork) => (
+                        <motion.div
+                          key={artwork.id}
+                          variants={item}
+                          layout
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="w-full"
+                        >
+                          <GalleryArtworkCard
+                            artwork={artwork}
+                            onClick={() => setSelectedArtwork(artwork)}
+                            isOwner={isOwner}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </>
+        ) : (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+               <h2 className="text-xl font-display font-medium text-neutral-900 dark:text-neutral-50 tracking-tight">
+                Expositions de {galleryProfile.username}
+              </h2>
+              {isOwner && (
+                <button
+                  className="px-6 py-2 border border-neutral-200 dark:border-neutral-800 text-[10px] uppercase tracking-[0.3em] hover:border-purple-600 transition-all font-medium"
+                  onClick={() => setShowCreateExhibitionModal(true)}
+                >
+                  Nouvelle Exposition
                 </button>
+              )}
+            </div>
+            {/* Exhibition Grid Placeholder */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {exhibitions.map(exhibition => (
+                <div 
+                  key={exhibition.id} 
+                  className="group cursor-pointer"
+                  onClick={() => navigate(`/artists/${galleryProfile.username}/exhibitions/${exhibition.id}`)}
+                >
+                  <div className="aspect-[16/9] bg-neutral-100 dark:bg-neutral-900 overflow-hidden mb-4 relative">
+                    {exhibition.cover_image_url ? (
+                      <img src={exhibition.cover_image_url} alt={exhibition.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center opacity-20">
+                        <Library size={48} />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <span className="text-[8px] uppercase tracking-[0.4em] text-white/70 block mb-1">Curation</span>
+                      <h3 className="text-white text-lg font-display font-medium uppercase tracking-widest">{exhibition.title}</h3>
+                    </div>
+                  </div>
+                </div>
               ))}
+              {exhibitions.length === 0 && !exhibitionsLoading && (
+                <div className="col-span-full py-24 text-center border-[0.5px] border-dashed border-neutral-200 dark:border-neutral-800">
+                  <p className="text-neutral-400 text-[10px] uppercase tracking-[0.4em]">Aucune exposition organisée</p>
+                </div>
+              )}
             </div>
           </div>
         )}
-
-        {/* Gallery Content Area with Stable Transitions */}
-        <div className="relative min-h-[400px]">
-          <AnimatePresence mode="wait" initial={false}>
-            {loading ? (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center justify-center py-48"
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                  className="w-10 h-10 border-[0.5px] border-neutral-200 dark:border-neutral-800 border-t-purple-600 rounded-full"
-                />
-              </motion.div>
-            ) : filteredArtworks.length === 0 ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center py-48"
-              >
-                <p className="text-neutral-400 dark:text-neutral-500 text-xs font-light uppercase tracking-[0.5em]">
-                  Aucun média correspondant
-                </p>
-              </motion.div>
-            ) : galleryProfile?.gallery_layout === 'masonry' ? (
-              <motion.div
-                key={`masonry-${filter}-${mediaFilter}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <MasonryLayout
-                  artworks={filteredArtworks}
-                  onArtworkClick={setSelectedArtwork}
-                  isOwner={isOwner}
-                />
-              </motion.div>
-            ) : galleryProfile?.gallery_layout === 'editorial' ? (
-              <motion.div
-                key={`editorial-${filter}-${mediaFilter}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <EditorialLayout
-                  artworks={filteredArtworks}
-                  onArtworkClick={setSelectedArtwork}
-                  isOwner={isOwner}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key={`grid-${filter}-${mediaFilter}`}
-                variants={container}
-                initial="hidden"
-                animate="show"
-                exit="hidden"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
-              >
-                <AnimatePresence mode="popLayout">
-                  {filteredArtworks.map((artwork) => (
-                    <motion.div
-                      key={artwork.id}
-                      variants={item}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="w-full"
-                    >
-                      <GalleryArtworkCard
-                        artwork={artwork}
-                        onClick={() => setSelectedArtwork(artwork)}
-                       isOwner={isOwner}
-                      />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
 
       {/* Upload Modal (Owner only) */}
@@ -502,6 +596,14 @@ export const GalleryPage = () => {
       />
 
       <ScrollToTop />
+
+      <CreateExhibitionModal
+        isOpen={showCreateExhibitionModal}
+        onClose={() => setShowCreateExhibitionModal(false)}
+        onSuccess={() => {
+          if (galleryProfile) fetchExhibitionsByUserId(galleryProfile.id)
+        }}
+      />
     </div>
   )
 }

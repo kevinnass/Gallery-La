@@ -1,4 +1,4 @@
-import { Home, Image as ImageIcon, Users, User as UserIcon, LogIn } from 'lucide-react'
+import { Home, Image as ImageIcon, Users, User as UserIcon, LogIn, Library } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
@@ -11,6 +11,7 @@ export const MobileBottomNav = () => {
   const navItems = [
     { name: 'Accueil', href: '/', icon: Home },
     { name: 'Galerie', href: '/gallery', icon: ImageIcon },
+    { name: 'Expos', href: '/exhibitions', icon: Library },
     { name: 'Artistes', href: '/artists', icon: Users },
   ]
 

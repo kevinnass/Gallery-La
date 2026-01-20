@@ -14,6 +14,7 @@ export const Header = () => {
   const navLinks = [
     { name: 'accueil', href: '/' },
     { name: 'galerie', href: '/gallery' },
+    { name: 'expositions', href: '/exhibitions' },
     { name: 'artistes', href: '/artists' },
   ]
 

@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { MobileBottomNav } from './components/layout/MobileBottomNav'
-import { CTAPopup } from './components/ui/CTAPopup'
 import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt'
 import { ScrollToTopOnNavigation } from './components/ui/ScrollToTopOnNavigation'
 import { ProfileCompletionModal } from './components/profile/ProfileCompletionModal'
@@ -12,6 +11,8 @@ import { AuthPage } from './pages/AuthPage'
 import { PublicGalleryPage } from './pages/PublicGalleryPage'
 import { ArtistsPage } from './pages/ArtistsPage'
 import { GalleryPage } from './pages/GalleryPage'
+import { ExhibitionDetailPage } from './pages/ExhibitionDetailPage'
+import { ExhibitionsPage } from './pages/ExhibitionsPage'
 import { MyGalleryRedirect } from './pages/MyGalleryRedirect'
 import { SettingsPage } from './pages/SettingsPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -72,8 +73,10 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/gallery" element={<PublicGalleryPage />} />
+        <Route path="/exhibitions" element={<ExhibitionsPage />} />
         <Route path="/artists" element={<ArtistsPage />} />
         <Route path="/artists/:username" element={<GalleryPage />} />
+        <Route path="/artists/:username/exhibitions/:exhibitionId" element={<ExhibitionDetailPage />} />
         <Route path="/my-gallery" element={<MyGalleryRedirect />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
