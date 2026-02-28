@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, AlertCircle, Loader2 } from 'lucide-react'
+import { Check, AlertCircle, Loader2 } from 'lucide-react'
 import { useProfile } from '@/hooks/useProfile'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'

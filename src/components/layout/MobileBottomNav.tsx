@@ -1,4 +1,4 @@
-import { Home, Image as ImageIcon, Users, User as UserIcon, LogIn, Library } from 'lucide-react'
+import { Home, Image as ImageIcon, Users, User as UserIcon, LogIn } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'

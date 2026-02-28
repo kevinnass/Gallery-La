@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trash2, Pencil } from 'lucide-react'
 import type { Artwork } from '@/hooks/useArtworks'

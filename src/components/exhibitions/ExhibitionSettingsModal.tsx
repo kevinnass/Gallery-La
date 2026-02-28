@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Loader2, LayoutGrid, Layout, Maximize2, Image as ImageIcon, Check } from 'lucide-react'
+import { X, Loader2, LayoutGrid, Layout, Maximize2, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useExhibitions, type ExhibitionWithArtworks } from '@/hooks/useExhibitions'
 
